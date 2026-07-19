@@ -1,0 +1,13 @@
+{
+  "name": "majksa",
+  "owner": { "name": "Ondrej Maxa" },
+  "plugins": [
+    { "name": "dev-loop", "source": "./plugins/dev-loop", "description": "Generic development loop: implement, ship, revise, refactor skills plus the supporting agent team (architect, developer, reviewer, tester, ...). Stack rules come from each repo's AGENTS.md." },
+    { "name": "authoring", "source": "./plugins/authoring", "description": "Create and maintain Claude Code skills, agents, and AGENTS.md files (create-skill, create-agent, meta)." },
+    { "name": "majksa-deploy", "source": "./plugins/majksa-deploy", "description": "Release-train deploy through the majksa-ops GitOps repo (Coolify): merge release PR, roll out dev, promote prod, change deploy config. App/services read from the host repo's config section." },
+    { "name": "notion-sprint", "source": "./plugins/notion-sprint", "description": "Notion sprint lifecycle: pick up work, complete items, reconcile statuses after merges. Board/database specifics read from the host repo's config section." },
+    { "name": "diagnose", "source": "./plugins/diagnose", "description": "Read-only production diagnosis via SigNoz (logs/traces), Coolify deploy state, and Postgres." },
+    { "name": "worktree", "source": "./plugins/worktree", "description": "Spin up an isolated herdr-managed git worktree for a ticket and launch an agent inside it." },
+    { "name": "mac-notify", "source": "./plugins/mac-notify", "description": "macOS notification (with sound) whenever Claude Code needs your attention." }
+  ]
+}

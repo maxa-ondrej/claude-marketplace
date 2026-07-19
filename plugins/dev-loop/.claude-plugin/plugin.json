@@ -1,0 +1,8 @@
+{
+  "name": "dev-loop",
+  "version": "0.1.0",
+  "description": "Generic development loop: implement, ship, revise, refactor skills plus the supporting agent team (architect, developer, reviewer, tester, ...). Stack rules come from each repo's AGENTS.md.",
+  "author": {
+    "name": "Ondrej Maxa"
+  }
+}

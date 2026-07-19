@@ -1,0 +1,8 @@
+{
+  "name": "majksa-deploy",
+  "version": "0.1.0",
+  "description": "Release-train deploy through the majksa-ops GitOps repo (Coolify): merge release PR, roll out dev, promote prod, change deploy config. App/services read from the host repo's config section.",
+  "author": {
+    "name": "Ondrej Maxa"
+  }
+}

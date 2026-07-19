@@ -1,0 +1,8 @@
+{
+  "name": "worktree",
+  "version": "0.1.0",
+  "description": "Spin up an isolated herdr-managed git worktree for a ticket and launch an agent inside it.",
+  "author": {
+    "name": "Ondrej Maxa"
+  }
+}
