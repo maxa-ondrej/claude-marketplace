@@ -8,7 +8,7 @@ My personal plugin marketplace for [Claude Code](https://docs.anthropic.com/en/d
 |---|---|---|
 | **dev-loop** | The core development loop: `/implement`, `/ship`, `/revise`, `/refactor` + the agent team (architect, developer, reviewer, tester, hater, …). Stack conventions come from the host repo's `AGENTS.md`. | — |
 | **authoring** | `/create-skill`, `/create-agent` + `meta`, `skill-creator`, `agent-creator` agents for maintaining `.claude/` config and `AGENTS.md` files. | — |
-| **majksa-deploy** | `/deploy` and `/update-deploy-config` through the `majksa-ops` GitOps repo (Coolify, two-stage rollouts). | repo `## Deploy` config; dev-loop's `/ship` produces the release PR it consumes |
+| **majksa-deploy** | `/deploy` and `/update-deploy-config` through **MajNet** (GitOps): release tags → stable auto-deploys; production via the admin-gated `env/production` render PR in the project's ops repo; config edits on ops `main`. | repo `## Deploy` config; dev-loop's `/ship` merges the change it releases |
 | **notion-sprint** | `/work`, `/complete`, `/reconcile` + `agile-coach` agent for the Notion sprint lifecycle. | repo `## Sprint` config; dev-loop for implement/ship |
 | **diagnose** | `/diagnose` — read-only production investigation via SigNoz, Coolify, Postgres. | repo `## Observability` config |
 | **worktree** | `/worktree` — spin up a herdr-managed git worktree for a ticket and launch an agent in it. | optional notion-sprint for ticket selection |

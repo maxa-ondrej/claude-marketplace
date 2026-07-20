@@ -30,9 +30,9 @@ Each infra plugin's `SKILL.md` starts its process with the same instruction:
 
 This keeps every repo-specific constant (app names, database IDs, service lists, seed-file
 lists, ...) in one discoverable place per repo, instead of scattered across skill files or
-inferred by guesswork. Sane personal defaults are allowed (e.g. the ops repo defaults to
-`maxa-ondrej/majksa-ops`) — the config section only needs to state what differs from the default,
-or be as explicit as you like.
+inferred by guesswork. Sane personal defaults are allowed (e.g. a MajNet project's ops repo is always
+`<org>/ops`, so declaring `org` is enough) — the config section only needs to state what differs
+from the convention, or be as explicit as you like.
 
 | Plugin | Config section | Used by |
 |---|---|---|
@@ -47,10 +47,10 @@ template, to adapt per repo:
 ```markdown
 ## Deploy
 
-- `repo`: maxa-ondrej/<this-repo>
-- `app`: <app-id-in-majksa-ops>
-- `services`: <service1>, <service2>, ...   (or: "auto-discover under applications/*")
-- `ops_repo`: maxa-ondrej/majksa-ops   (default — omit if using the default)
+- `org`: <project-github-org>            (ops repo is <org>/ops, managed by MajNet)
+- `repo`: <org>/<this-repo>
+- `apps`: <app1>, <app2>, ...             (monorepo: one image per app, ghcr.io/<org>/<repo>/<app>)
+- `tag_format`: @<scope>/<app>@vX.Y.Z    (per-app tags; or plain vX.Y.Z for solo repos)
 
 ## Sprint
 
@@ -102,8 +102,8 @@ entirely specific to sideline's doc tree. A different repo has a different (or n
 repo-local addition invoked alongside `dev-loop`'s `/ship`) invokes this `docs` agent **if it
 exists** in that repo's `.claude/agents/`, in parallel with any doc-adjacent step `dev-loop`
 itself defines (e.g. alongside a generic `meta` agent that keeps `AGENTS.md` files honest). The
-convention: *dev-loop's `ship` skill only knows generic release mechanics (changesets, PR,
-CI); a repo that wants doc-surface automation adds its own `docs` agent and has its repo-local
+convention: *dev-loop's `ship` skill only knows generic delivery mechanics (PR, CI, review);
+a repo that wants doc-surface automation adds its own `docs` agent and has its repo-local
 `ship` (or a `postShip` step) call it.*
 
 ### Pattern: a `create-app` skill for monorepo scaffolding
@@ -112,8 +112,8 @@ Source (reference only, not copied): `websites`' `.claude/skills/create-app/SKIL
 
 This skill interactively scaffolds a brand-new application under that monorepo's
 `applications/<name>/` (asking for name, app type, libraries, toolchain, target environments,
-domains via `AskUserQuestion`), then onboards it into `majksa-ops` for deployment by writing
-`config/<app>/web/service*.yml`.
+domains via `AskUserQuestion`), then onboards it for deployment by declaring the app in the
+project org's MajNet `ops` repo (per-app `base.yaml` + class overlays).
 
 **Why this can't be a marketplace plugin:** the scaffolding template (`bin/create-client`, the
 specific stack — TanStack Start + React 19 + Tailwind 4 + Vitest + Playwright — and the
@@ -149,11 +149,11 @@ still works standalone), but the workflows compose:
 - **`notion-sprint`'s `work` skill → `dev-loop`'s `/implement` and `/ship`.** After the
   `agile-coach` agent picks up a ticket and creates a branch, `work` hands off to `dev-loop` to
   actually write the code and open the PR, then returns to `notion-sprint` to update statuses.
-- **`majksa-deploy`'s `deploy` skill consumes the release PR that `dev-loop`'s `/ship` produces.**
-  `ship` is expected to create a changeset and let the repo's Changesets release workflow open a
-  "Version Packages" PR; `deploy` picks up from there (merges the release PR, rolls out dev, then
-  prod). If a repo's `ship` skill doesn't create changesets, `majksa-deploy`'s `deploy` skill has
-  nothing to promote.
+- **`majksa-deploy`'s `deploy` skill picks up where `dev-loop`'s `/ship` ends.** `ship` lands
+  the change on `main` (PR + CI + review); `deploy` then cuts the release tags (one tag per push
+  — GitHub drops events on >3-tag pushes), MajNet auto-tracks the release into `stable`, and
+  production goes through the promote + admin-merged `env/production` render PR in the project's
+  ops repo. No changesets or release PRs are involved.
 - **`worktree`'s ticket selection optionally defers to `notion-sprint`.** If `notion-sprint` is
   installed, `worktree` uses its `agile-coach` agent to pick the next not-started ticket and to
   pass a ticket ID through to the spawned agent's initial prompt (`/work <ticket-id>`). If

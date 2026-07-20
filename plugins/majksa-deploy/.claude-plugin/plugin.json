@@ -1,7 +1,7 @@
 {
   "name": "majksa-deploy",
-  "version": "0.1.0",
-  "description": "Release-train deploy through the majksa-ops GitOps repo (Coolify): merge release PR, roll out dev, promote prod, change deploy config. App/services read from the host repo's config section.",
+  "version": "0.2.0",
+  "description": "Release and configure apps through MajNet: cut release tags (stable auto-deploys), promote to production via the admin-gated env/production render PR, and change deploy config through the project's ops repo. Repo specifics read from the host repo's ## Deploy config section.",
   "author": {
     "name": "Ondrej Maxa"
   }

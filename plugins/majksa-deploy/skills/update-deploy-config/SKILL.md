@@ -1,97 +1,29 @@
 ---
 name: update-deploy-config
-description: Change deploy configuration — environment variables, secrets, image tags, domains, healthchecks — for dev or prod. All changes go through the majksa-ops GitOps repo (SOPS-encrypted secrets, rendered to env/* branches, applied to Coolify by CI), NOT the read-only Coolify CLI. Use when the user asks to set/rotate an env var or secret, add a deploy config value, or change deployment settings for dev/prod.
+description: Change MajNet deploy configuration — env vars, SOPS secrets, app manifests, domains, migration commands — by editing the project's ops repo main branch and letting the bot render env/<class> branches. Use when the user asks to set/rotate an env var or secret, add a deploy config value, or change deployment settings for any class (testing/stable/production/ephemeral).
 ---
 
-# Update Deploy Config Skill
+# Update Deploy Config Skill (MajNet)
 
-## Step 0: Read the host repo's config
+All deploy configuration for a MajNet project lives in the project org's **`<org>/ops` repo, on `main`** — the single source of truth humans (and the dashboard) edit: `project.yaml`, per-app `base.yaml` + class overlays, and SOPS-encrypted secrets alongside. The bot renders `main` into the `env/<class>` branches via **render PRs**; merging a render PR is what actually applies the change. Never edit `env/*` branches directly.
 
-Read the `## Deploy` section of the host repo's CLAUDE.md (or AGENTS.md). If it is missing,
-STOP and tell the user what to add. Expected keys (shared with the `deploy` skill):
+## Step 0: Read the repo's Deploy config
 
-| Key | Meaning | Example |
-|---|---|---|
-| `repo` | GitHub slug of this repo | `maxa-ondrej/sideline` |
-| `app` | App identifier used in `majksa-ops` config paths | `sideline` |
-| `services` | Deployable service names | `server, bot, web, proxy, docs` |
-| `ops_repo` *(optional)* | GitOps repo slug. Defaults to `maxa-ondrej/majksa-ops` | `maxa-ondrej/majksa-ops` |
-| `ops_repo_path` *(optional)* | Local clone path of the ops repo. Defaults to `~/Projects/majksa-ops` | `~/Projects/majksa-ops` |
-| `domains` *(optional)* | Per-env domain, for verification messaging | `dev: sideline.majksa.net, prod: sideline.cz` |
+Read the `## Deploy` section of the host repo's `CLAUDE.md`/`AGENTS.md` for `org` and `apps` (the ops repo is `<org>/ops`). Then read the ops repo's own README/structure before editing — the manifest schema is defined by the platform (`~/Projects/majnet`, `docs/design.md` §manifests, ADR 0009): per-app `base.yaml` plus `testing`/`stable`/`production`/`ephemeral` overlays; the bot merges base + overlay per app at render time.
 
-This app's deploy config is **GitOps-managed** in the `<ops_repo>` repo at `<ops_repo_path>`. The
-Coolify CLI is read-only — you do **not** set env vars or secrets through it. You edit config on
-`main`, push, and let CI render → open env PRs → sync to Coolify and redeploy.
+## Rules
 
-Read `<ops_repo_path>/AGENTS.md` (conventions) and `<ops_repo_path>/RUNBOOK.md` (procedures)
-before non-trivial changes. This skill is the quick path for the common case: changing an env
-var or secret.
+1. **Everything goes through ops `main`** — a normal branch + PR against `<org>/ops` (or a direct commit if the user says so and branch protection allows). The dashboard writes become bot-authored commits to the same place; you and the dashboard never conflict on rendered branches.
+2. **Secrets are SOPS + age.** Recipients are the platform's per-class key plus the project admins' keys — the `production` class has its own key. Edit with `sops <file>` (requires an admin age key locally); never commit plaintext, and note that rendering never decrypts — the reconciler decrypts on the node at converge time.
+3. **Migrations** are ops config, not release artifacts: `migration = { image?, command }` in the app's `base.yaml`. The command is version-independent; the migration files travel in the app image.
+4. **Class scope**: put a value in `base.yaml` when it applies everywhere; in an overlay when it's class-specific (e.g. a production-only domain, a testing-only flag).
+5. After merging to ops `main`, the bot opens render PR(s) for each affected class: `testing`/`stable`/`ephemeral` auto-merge (change applies as soon as the reconciler converges); **`env/production` requires admin review + merge** — that merge is the production apply, and its diff is the exact final manifest change.
+6. **Rollback** = `git revert` on ops `main` → bot re-renders → merge the resulting render PR(s).
 
-## Where things live (per service)
+## Execution
 
-```
-config/<app>/<service>/                    # service ∈ configured `services`
-├── service.yml            # base: image, ports, NON-secret `environment:`, healthcheck, volumes
-├── service.dev.yml        # dev overrides: tag, domains, per-env NON-secret `environment:`
-├── service.prod.yml       # prod overrides
-├── secrets.dev.enc.yaml   # SOPS+age encrypted SECRETS for dev
-└── secrets.prod.enc.yaml  # SOPS+age encrypted SECRETS for prod
-```
-
-Decide where a value goes:
-- **Non-sensitive** (URLs, flags, model names) → `environment:` in `service.yml` (all envs) or
-  `service.<env>.yml` (one env).
-- **Sensitive** (keys, passwords, tokens) → `secrets.<env>.enc.yaml`.
-
-Both end up in the same Coolify env-var bag at deploy time. `env` ∈ `dev` / `prod`, mapped to
-`<domains>` if configured.
-
-## Editing a secret (SOPS + age)
-
-The age private key is at `<ops_repo_path>/.age-key` (gitignored). Always pass it explicitly:
-
-```bash
-cd <ops_repo_path>
-SOPS_AGE_KEY_FILE=.age-key sops edit config/<app>/<service>/secrets.<env>.enc.yaml
-```
-
-`sops edit` decrypts to a temp buffer and re-encrypts in place on save — only the `.enc.yaml` is
-committed. (Plaintext `secrets.*.yaml` working copies are gitignored; the canonical edit is `sops edit`
-of the `.enc.yaml`.) Never commit plaintext secrets, never print secret values into logs/PRs.
-
-## The flow (what happens after you commit to `main`)
-
-1. **Edit on `main`** — change `service*.yml` (non-secret) or `sops edit` the `secrets.<env>.enc.yaml`.
-2. **Commit + push to `main`** (config source of truth). This triggers `sync_config`.
-3. **`sync_config`** renders config and opens a **PR to `env/<env>`** per service. Review/merge it.
-4. **Merging the env PR** triggers **`rollout`** (`sync_service` → `sync_secrets` → `sync_deploy`):
-   secrets/env are pushed to the Coolify Application and changed services are redeployed (rolling).
-
-Do **not** edit `env/*` branches directly — they are rendered output.
-
-## Worked example — add a secret to a service, dev + prod
-
-```bash
-cd <ops_repo_path>
-# generate a DISTINCT key per environment (base64, 32 bytes)
-SOPS_AGE_KEY_FILE=.age-key sops edit config/<app>/<service>/secrets.dev.enc.yaml
-#   add:  MY_NEW_SECRET: "<openssl rand -base64 32>"
-SOPS_AGE_KEY_FILE=.age-key sops edit config/<app>/<service>/secrets.prod.enc.yaml
-#   add:  MY_NEW_SECRET: "<a DIFFERENT openssl rand -base64 32>"
-git checkout -b chore/add-my-new-secret
-git add config/<app>/<service>/secrets.dev.enc.yaml config/<app>/<service>/secrets.prod.enc.yaml
-git commit -m "feat(<app>): add MY_NEW_SECRET for <service> (dev+prod)"
-git push -u origin chore/add-my-new-secret   # open PR to main; merge → sync_config → env PRs → rollout
-```
-
-Guidance for this kind of key:
-- Use a **different** key per environment; never reuse a preview/dev key in prod.
-- A key is **stable once data is encrypted with it** — rotating it later orphans existing encrypted
-  secrets (may require manual re-entry downstream). Set once per env and leave it.
-
-## Safety
-
-- Prod is real: prefer a PR + the user's review over committing straight to `main`, and confirm the
-  target env. Coolify redeploys the affected service when the env PR merges.
-- Verify after rollout with the diagnose plugin, if installed (Coolify CLI `app env list` to
-  confirm the var exists; SigNoz to confirm the service came back healthy).
+1. Read the current config in `<org>/ops` `main` for the affected app(s) — `base.yaml`, the relevant overlay, and the secrets file layout.
+2. Make the change on a branch; for secrets, edit via `sops` so the file stays encrypted. Open a PR to ops `main` and merge it (or hand to the user if their review is warranted — e.g. production secrets).
+3. Watch for the bot's render PR(s). Confirm the rendered diff matches the intent for each affected class.
+4. Non-production classes: confirm the render PR auto-merged and the reconciler converged. Production: present the render-PR diff to the user, merge on their go-ahead (admin gate), then verify the new commit on `env/production`.
+5. Report: the ops-main commit, the render PR(s) and their state, and what is now live per class.
