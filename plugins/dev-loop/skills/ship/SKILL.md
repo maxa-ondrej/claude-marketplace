@@ -55,18 +55,9 @@ If it reports **critical issues**, fix them and re-run Step 3 before proceeding.
 
 ---
 
-### Step 4: Create a changeset (if the repo uses Changesets)
+### Step 4: Versioning note
 
-If a `.changeset/` directory exists in the repo and any package source code changed (not just docs/config), create a changeset:
-
-- Determine which packages were affected — include any package with meaningful code changes. Private packages are not excluded.
-- Apply bump rules:
-  - **patch** — small features, bug fixes, refactors
-  - **minor** — larger features, significant new functionality
-  - **major** — NEVER. Do not bump major.
-- Write a short summary of the changes in the changeset body
-
-Stage the generated changeset file before committing.
+Nothing version-related is needed in the PR. Releases happen after merge, outside this skill: a release tag only triggers the Docker image build (MajNet consumes the published image — see the majksa-deploy plugin's `/deploy`). Do not create changesets or bump versions.
 
 ---
 
