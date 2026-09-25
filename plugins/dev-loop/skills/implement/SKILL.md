@@ -1,150 +1,97 @@
 ---
 name: implement
-description: Research, plan, write tests, implement, verify, review, and refactor a story or bug. The full development loop from plan to clean code. Use this whenever the user asks to implement, build, code, fix, or do any development work.
+description: Build an approved plan — tests first, then code, one developer per package in parallel — or fix the findings /review wrote. Writes .dev-loop/implementation.md. Use whenever the user asks to implement, build, code, or fix.
+argument-hint: [nothing — builds .dev-loop/plan.md] | --fix
 ---
 
 # Implement Skill
 
-Develop a story, feature, or bug end-to-end: research, plan, design, TDD, implement, verify, review, refactor.
+Write the code. Two modes:
 
-## Execution
+- **Build mode** (default) — build `.dev-loop/plan.md` from scratch.
+- **Fix mode** (`--fix`) — work through the open findings in `.dev-loop/review/`.
 
-Follow these phases **in order**. Stop and report if any phase fails. The caller provides the description and task list via `$ARGUMENTS`.
+**Output:** `.dev-loop/implementation.md`
 
-Invoke each specialist agent directly via the Agent tool from the main thread — do NOT nest them inside a manager agent. This gives the user visibility into each step.
+## Build mode
 
-### User input via chat
+### 1. Load the plan
 
-Whenever this skill needs user input (plan approval, confirmation, feedback):
+Read `.dev-loop/plan.md` and `.dev-loop/design.md` if present. No plan on disk? Run
+`/dev-loop:plan` first — do not improvise one. If `$ARGUMENTS` describes work that is not in the
+plan, say so and stop.
 
-1. **Render the plan** for the user. If a visual/canvas rendering skill is available, pass it the full plan content (architecture, design spec, task breakdown) so it produces a polished visual document the user can review at a glance. Otherwise, display the content directly in the chat as formatted markdown.
-2. **Provide the file link** to the plan file (e.g., the plan markdown file path) so the user can review in their editor if they prefer.
-3. **Ask the user** to choose one of:
-   - **Accept** — proceed as-is
-   - **Suggest changes** — provide feedback for revision
-   - **Decline** — stop the skill
+### 2. Prepare shared contracts first
 
-Use this pattern for ALL plan presentations — always re-render the updated plan after feedback, before asking again.
+If the plan changes a shared types/schema/contracts package that other packages import, invoke one
+`developer` agent for that package alone and have it build the package. Everything downstream
+imports from it, so it has to exist before tests are written.
 
----
+Skip if the plan touches no such package.
 
-### Phase 1: Research (optional)
+### 3. Tests first
 
-If the story involves unfamiliar APIs, libraries, or patterns, invoke the `researcher` agent with the relevant topics.
+Invoke the `tester` agent in **TDD mode** with the plan's test specification. It writes every test
+file before any implementation. They fail. That is the point.
 
-Skip this phase if the story uses well-known patterns already present in the codebase.
+Then run the repo's format and typecheck commands (from AGENTS.md) yourself — a Bash call, not an
+agent — and hand any failures back to the tester.
 
----
+### 4. Implement
 
-### Phase 2: Plan & Design (parallel)
+One `developer` agent **per affected package or app, in parallel** (all Agent calls in one
+message). Each receives the plan filtered to its own scope, the design spec if relevant, and the
+note that tests already exist and must pass.
 
-Run the architect and designer **in parallel** (launch both Agent calls in one message):
+One package affected? One agent. Do not parallelize for its own sake.
 
-1. **Invoke the `architect` agent** with:
-   - The story description and task list
-   - Any research findings (from the researcher)
+### 5. Verify
 
-2. **Invoke the `designer` agent** with:
-   - The story description and task list
-   - Focus: design specifications for any user-facing changes (UI screens, components, chat/bot interfaces, embeds/commands)
+Run the repo's format, codegen, typecheck, and test commands (from AGENTS.md). These are Bash
+calls from this thread — there is no agent for running a command and reading its exit code.
 
-   **Skip the designer** if the story has **no user-facing changes** (e.g., pure backend logic, database migrations, internal refactors with no UI).
+On failure, hand the errors to the `developer` agent that owns those files, then re-run. Repeat
+until green. No round limit.
 
-3. **Invoke the `hater` agent** — and the `principal-engineer` agent in parallel, if one is available — with the architect's plan **and** the designer's design specification (if produced). The hater critiques both for logical flaws, missing edge cases, UX issues, and architectural problems. The principal engineer (if present) reviews for type safety, architectural soundness, and end-to-end correctness.
+Then invoke the `tester` agent in **verify mode** to fill coverage gaps the plan's spec missed.
 
-4. If the hater or principal engineer finds **blockers** or **critical issues**, send the combined critique back to the `architect` and/or `designer` agent for revision. Repeat architect/designer -> hater (and principal engineer) until no blockers remain.
+### 6. Write the summary
 
-5. Present the final plan and design to the user for approval using the **chat pattern** described above. If the user provides feedback, send it back to the relevant agent(s) for revision, re-render the updated plan, and repeat.
+Write `.dev-loop/implementation.md`: one section per task, the files created and modified, and any
+deviation from the plan with its reason. Deviations matter more than the file list — `/review`
+reads them.
 
----
+### 7. Report
 
-### Phase 3: Prepare shared/domain package (if applicable)
-
-If the repo has a shared contracts/schema/types package that other packages import (e.g. a `domain` or `contracts` package), get it ready before writing tests:
-
-1. **Invoke the `developer` agent** with:
-   - The approved implementation plan (shared-package tasks only)
-   - Instruction: implement only the shared package's files — API contracts, schemas, models, types
-   - After changes, run the repo's build command for that package (see AGENTS.md/package scripts)
-
-2. This ensures that tests and application code can import the new shared types.
-
-**Skip this phase** if the plan has no shared/domain package changes.
+Tasks done, checks green, the file path. Three lines.
 
 ---
 
-### Phase 4: Write tests first (TDD)
+## Fix mode (`--fix`)
 
-Invoke the `tester` agent in **TDD mode** with the architect's test specification. The tester writes all test files before any implementation begins. These tests should fail initially — that's expected and correct.
+### 1. Read the findings
 
----
+Read every file in `.dev-loop/review/`. Collect the unchecked (`- [ ]`) findings at **Blocker** and
+**Must Fix** severity. Include **Should Fix** only if the user asked for them.
 
-### Phase 4b: Verify tests
+Nothing unchecked? Say so and stop.
 
-After tests are written, verify they are clean:
+### 2. Fix them
 
-1. Invoke the `formatter` agent to run the repo's format command and stage fixes
-2. Invoke the `analyzer` agent to run the repo's typecheck command and report type errors
-3. If the analyzer reports failures, invoke the `tester` agent to fix them, then re-run `formatter` and `analyzer` until clean.
+Group findings by the package that owns them and invoke one `developer` agent per group, in
+parallel. Each gets its findings verbatim.
 
-Then review the test code:
+A finding that contradicts AGENTS.md is not fixed silently — the developer notes the conflict and
+leaves it. Surface those to the user.
 
-4. Invoke the `reviewer` agent on the new test files
-5. Invoke the `hater` agent on the new test files
+### 3. Tick them off
 
-If **must-fix** issues are found, invoke the `tester` agent with the feedback, then re-run `formatter` and `analyzer`. Repeat until no must-fix issues remain.
+Change `- [ ]` to `- [x]` for each finding actually fixed, in the file it came from. Leave the rest
+unchecked, with a one-line note on why.
 
----
+### 4. Verify and append
 
-### Phase 5: Implement (parallel per package/application)
+Re-run format, typecheck, and tests. Append a `## Review fixes` section to
+`.dev-loop/implementation.md` listing what changed.
 
-After tests are written, implement application code **in parallel** — one `developer` agent per affected package or application:
-
-1. Determine which packages/applications are affected by the plan.
-
-2. **Launch one `developer` agent per package/application in parallel** (all in one message). Each receives:
-   - The approved implementation plan (filtered to tasks relevant to that package/application)
-   - The designer's design specification, if applicable
-   - The task list scoped to that package/application
-   - Note: any shared/domain package is already built, tests already exist and must pass after implementation
-
-3. Each developer implements its scope independently and reports what was changed.
-
-If only one package/application is affected, run a single developer agent (no need to parallelize).
-
----
-
-### Phase 6: Verify
-
-Run verification agents:
-
-1. Invoke the `formatter` agent to run the repo's format command and stage fixes
-2. Invoke the `analyzer` agent to run the repo's typecheck command and report type errors
-3. Invoke the `tester` agent in **verify mode** to run the repo's test command and fill any remaining coverage gaps
-
-If the analyzer or tester report failures, invoke the `developer` agent with the errors to fix them. Then re-run the failing verification agent. Repeat until all checks pass — no round limit.
-
----
-
-### Phase 7: Review
-
-1. Invoke the `reviewer` agent on the changed files
-2. Invoke the `hater` agent — and the `principal-engineer` agent in parallel, if one is available — on the final code. The principal engineer (if present) focuses on type-safety strictness, dependency leakage, and cascade impact.
-
-If **must-fix** or **critical** issues are found:
-1. Invoke the `developer` agent with the combined feedback
-2. Re-run `formatter`, `analyzer`, `tester` to verify fixes
-3. Repeat until no must-fix issues remain — no round limit.
-
----
-
-### Phase 8: Refactor
-
-Invoke the `refactorer` agent with the list of changed files (from `git diff --name-only main`).
-
-Focus on:
-- Ensuring compliance with the project's code style (see AGENTS.md)
-- Removing unnecessary complexity introduced during implementation
-- Keeping changes minimal — don't refactor unrelated code
-
-After refactoring, re-run `formatter`, `analyzer`, `tester` to verify nothing broke.
+Then re-run `/dev-loop:review` to confirm the fixes hold.

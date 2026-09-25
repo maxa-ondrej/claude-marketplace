@@ -60,7 +60,9 @@ Write this kind of test for user-facing or cross-system flows that are too broad
 
 ## Output Format
 
-```
+Return this to the caller (the tester does not write to `.dev-loop/`):
+
+```markdown
 ## Test Results
 
 ### Existing Tests

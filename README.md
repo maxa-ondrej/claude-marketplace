@@ -6,12 +6,12 @@ My personal plugin marketplace for [Claude Code](https://docs.anthropic.com/en/d
 
 | Plugin | What it provides | Depends on |
 |---|---|---|
-| **dev-loop** | The core development loop: `/implement`, `/ship`, `/revise`, `/refactor` + the agent team (architect, developer, reviewer, tester, hater, …). Stack conventions come from the host repo's `AGENTS.md`. | — |
+| **dev-loop** | The development loop as composable steps: `/research` → `/plan` → `/implement` → `/review`, plus `/ship`. Each writes markdown into `.dev-loop/` that the next one reads. Agent team: architect, designer, developer, tester, reviewer, hater, researcher. Stack conventions come from the host repo's `AGENTS.md`. | — |
 | **authoring** | `/create-skill`, `/create-agent` + `meta`, `skill-creator`, `agent-creator` agents for maintaining `.claude/` config and `AGENTS.md` files. | — |
 | **majksa-deploy** | `/deploy` and `/update-deploy-config` through **MajNet** (GitOps): release tags → stable auto-deploys; production via the admin-gated `env/production` render PR in the project's ops repo; config edits on ops `main`. | repo `## Deploy` config; dev-loop's `/ship` merges the change it releases |
-| **notion-sprint** | `/work`, `/complete`, `/reconcile` + `agile-coach` agent for the Notion sprint lifecycle. | repo `## Sprint` config; dev-loop for implement/ship |
+| **notion-sprint** | `/work`, `/complete`, `/reconcile` + `agile-coach` agent for the Notion sprint lifecycle. `/work` picks the ticket and hands it to a worktree agent. | repo `## Sprint` config; worktree; dev-loop |
 | **diagnose** | `/diagnose` — read-only production investigation via SigNoz, Coolify, Postgres. | repo `## Observability` config |
-| **worktree** | `/worktree` — spin up a herdr-managed git worktree for a ticket and launch an agent in it. | optional notion-sprint for ticket selection |
+| **worktree** | `/worktree <branch> -- <prompt>` — open a branch in an isolated herdr worktree, launch a Claude agent in it, remove the worktree when that agent exits. Knows nothing about tickets. | herdr (`HERDR_ENV=1`) |
 | **mac-notify** | macOS notification + sound whenever Claude Code needs attention. | — |
 
 ## Install

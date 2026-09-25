@@ -70,8 +70,8 @@ template, to adapt per repo:
 
 ## Worktree
 
-- `script`: scripts/herdr-worktree.sh
-- `seed_paths`: .env.local, .env.preview.local, .claude/settings.local.json
+- `seed`: .env.local, .env.preview.local, .claude/settings.local.json
+- `setup`: direnv allow && pnpm install
 ```
 
 Only include the sections your repo actually needs — a repo without Notion sprint tracking simply
@@ -139,7 +139,7 @@ monorepo's app types and libraries.
 
 ### Pattern: a stack-specific standards agent (`principal-engineer`)
 
-`websites` keeps a `principal-engineer` agent (`/Users/ondrej.maxa/Projects/websites/.claude/agents/principal-engineer.md`) that is ~70% a TypeScript + Effect.ts standards reference with code samples. That depth is exactly why it stays repo-local: genericized, it would collapse into a duplicate of the marketplace `reviewer`/`hater` agents. The dev-loop skills already reference it *conditionally* — `implement`, `refactor`, `revise`, and `ship` say "if a `principal-engineer` agent is available, run it as an extra reviewer". To get that extra review in any repo, write a local `.claude/agents/principal-engineer.md` carrying THAT repo's deep standards; the marketplace skills will pick it up by name automatically.
+`websites` keeps a `principal-engineer` agent (`/Users/ondrej.maxa/Projects/websites/.claude/agents/principal-engineer.md`) that is ~70% a TypeScript + Effect.ts standards reference with code samples. That depth is exactly why it stays repo-local: genericized, it would collapse into a duplicate of the marketplace `reviewer`/`hater` agents. dev-loop 0.3.0 dropped the conditional "if a `principal-engineer` agent is available" hooks — six hedges across the skills for an agent that exists in one repo. To get that extra review in any repo now, write a local `.claude/agents/principal-engineer.md` carrying THAT repo's deep standards and invoke it alongside `/dev-loop:review`, or point a repo-local wrapper skill at it.
 
 ## (d) Cross-plugin dependency notes
 

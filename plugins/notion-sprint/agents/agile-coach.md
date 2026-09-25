@@ -1,6 +1,6 @@
 ---
 name: agile-coach
-description: Manages Notion sprint work items — fetches, creates, updates tasks and stories. Selects the next work item, updates statuses, and creates feature branches.
+description: Manages Notion sprint work items — fetches, creates, updates tasks and stories. Selects the next work item, updates statuses, and reports the branch name to use.
 tools: Bash, Read, Glob, Grep
 color: green
 ---
@@ -167,38 +167,24 @@ Update **ALL** statuses **immediately**:
 
 **Do not skip updating tasks.** All tasks must be marked "in progress" before proceeding.
 
-### 5. Create a feature branch
+### 5. Report the branch name
 
-**First, detect whether you are in a linked git worktree** (the worktree plugin's flow runs you
-inside one):
-
-```bash
-test -f .git && echo "linked-worktree" || echo "main-checkout"
-```
-
-- **If `.git` is a file (linked worktree):** the correct feature branch is **already checked out**
-  here, and you **must NOT** run `git checkout main` — `main` is checked out in the primary repo
-  and git will refuse it (`fatal: 'main' is already used by worktree`). Do **not** create or switch
-  branches. Just confirm the current branch with `git branch --show-current`, report it, and
-  proceed.
-- **If `.git` is a directory (normal checkout):** follow the flow below.
-
-Before any code is written, ensure you're starting from a clean, up-to-date `main`:
+**Never create or switch branches.** Branch creation belongs to the caller — the `/work` skill
+hands the branch name to the worktree plugin, which creates it from `origin/main` when it opens
+the worktree.
 
 ```bash
-git checkout main
-git pull origin main
-git checkout -b feat/story-name
+test -f .git && echo worktree || echo main
 ```
 
-Use the config's branch-naming convention (e.g. `feat/` for stories, `fix/` for bugs) when naming
-the branch.
+- **Linked worktree** (`.git` is a file): the correct branch is already checked out. Confirm it
+  with `git branch --show-current` and report it.
+- **Main checkout** (`.git` is a directory): derive the branch name from the ticket using the
+  config's naming convention (e.g. `feat/` for stories, `fix/` for bugs) and report it. Do **not**
+  check it out — `main` must stay checked out here.
 
-**Branch rules:**
-- Always create a **new branch from `main`** for each story
-- If resuming in-progress work that already has an **unmerged branch for the same story**, switch
-  to that branch and rebase on main instead
-- If a previous branch for a different story exists, ignore it — start fresh from `main`
+If the ticket is resuming work that already has an unmerged branch, report that existing branch
+name instead of a new one.
 
 ### 6. Present work summary
 
@@ -207,7 +193,7 @@ Output:
 - Story/bug title and description
 - List of tasks with their status, type, and estimate
 - Which tasks are already done vs remaining
-- Branch name created
+- Branch name to use
 
 ## Update Statuses After PR Created
 
@@ -225,11 +211,6 @@ When invoked to mark work as fully complete (PR merged):
 1. Move the **story** to its terminal "done" status
 2. Move the **bug** to its terminal "fixed" status
 3. **Never** move epics or milestones to their terminal "done" status — that is done manually
-4. Switch back to `main` and pull latest:
-   ```bash
-   git checkout main
-   git pull origin main
-   ```
 
 ## Output Format
 

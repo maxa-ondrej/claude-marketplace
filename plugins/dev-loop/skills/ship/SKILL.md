@@ -1,128 +1,92 @@
 ---
 name: ship
-description: Commit, push, open a PR, verify CI, and address code review comments. The delivery loop from local changes to a reviewed PR. Use this whenever the user asks to commit, push, ship, send, or submit changes.
+description: Commit, push, open a PR, watch CI, and pull review comments back in as findings. The delivery loop from local changes to a reviewed PR. Use whenever the user asks to commit, push, ship, send, or submit changes.
 ---
 
 # Ship Skill
 
-Commit local changes, push, open a PR, and handle CI + code review.
+Get the work out of the working tree and into a reviewed PR.
+
+**Never push directly to `main`.** Everything goes through a feature branch and a PR.
 
 ## Execution
 
-Follow these steps **in order**. Stop and report if any step fails.
+### 1. Check there is something to ship
 
-**Never push directly to `main`.** All work goes through feature branches and pull requests.
+`git status` and `git diff`. Nothing changed? Say so and stop.
 
----
+### 2. Update docs and agent config
 
-### Step 1: Check for changes
+If the project has a `docs` agent, or the authoring plugin's `meta` agent is available, run them —
+**in parallel, one message** — to update documentation and AGENTS.md from the diff. Stage whatever
+they change.
 
-Run `git status` and `git diff` to understand what changed. If there are no changes, tell the user and stop.
+Skip silently if neither exists.
 
----
+### 3. Run the checks
 
-### Step 2: Update documentation and agent config
+Run the repo's format, codegen, typecheck, and test commands (from AGENTS.md). All four must pass.
+Stage anything format or codegen rewrote.
 
-If the project provides a `docs` agent, invoke it to update documentation (reading the diff to identify affected docs, and checking generated/mock data if API schemas changed).
+### 4. Review before pushing
 
-Run the `meta` agent (authoring plugin) if available, to update AGENTS.md files and `.claude/` configuration:
-- Reads the diff to identify new patterns, conventions, or architecture changes
-- Updates the relevant AGENTS.md files with precise, unambiguous instructions
-- Updates agent/skill definitions if workflow changed
+Run `/dev-loop:review`. If it leaves unchecked `Blocker` or `Must Fix` findings, run
+`/dev-loop:implement --fix` and come back to step 3.
 
-If either agent is available, run them **in parallel** (both in one message). If either agent makes changes, stage them before proceeding.
+Shipping a known must-fix and hoping the PR reviewer catches it is how it reaches main.
 
----
+### 5. Commit
 
-### Step 3: Run all checks
+- Stage the relevant files. Never `.env`, credentials, or `.dev-loop/`
+- One concise message saying **why**, not what. Use a HEREDOC to preserve formatting
+- If the user gave a message in `$ARGUMENTS`, use it
+- No `Co-Authored-By`, `Generated-By`, or AI attribution footers
 
-Run the repo's format, codegen (if any), typecheck, and test commands — see AGENTS.md or `package.json` scripts for the exact commands — and make sure they all pass:
-
-- Format/lint
-- Codegen (regenerate generated code, if the repo has a codegen step)
-- Typecheck
-- Test
-
-Stage any files modified by format/codegen before proceeding.
-
----
-
-### Step 3b: Principal engineer review (if available)
-
-If a `principal-engineer` agent is available, invoke it on the changed files (`git diff main --name-only`). It reviews for type safety, architectural soundness, and end-to-end impact.
-
-If it reports **critical issues**, fix them and re-run Step 3 before proceeding.
-
----
-
-### Step 4: Versioning note
-
-Nothing version-related is needed in the PR. Releases happen after merge, outside this skill: a release tag only triggers the Docker image build (MajNet consumes the published image — see the majksa-deploy plugin's `/deploy`). Do not create changesets or bump versions.
-
----
-
-### Step 5: Commit
-
-- Stage all relevant files (avoid secrets like `.env`, credentials)
-- Write a concise commit message describing **why**, not what
-- If the user provided a message via `$ARGUMENTS`, use that as the commit message
-- Never add `Co-Authored-By`, `Generated-By`, or any AI attribution footers
-- Use a HEREDOC for the commit message to preserve formatting
-
----
-
-### Step 6: Push and open PR
-
-Run `git push` to push the commit to the remote. If the branch has no upstream yet, use `git push -u origin <branch>`.
-
-Then open a pull request with `gh pr create` (skip if a PR already exists). If the project's tracker workflow defines a PR-body convention (e.g. linking a Notion/Jira item), follow it — that lookup belongs to the tracker workflow (e.g. the notion-sprint plugin), not this skill.
+### 6. Push and open the PR
 
 ```bash
-gh pr create --title "<short title>" --body "$(cat <<'EOF'
+git push -u origin "$(git branch --show-current)"
+```
+
+Then `gh pr create`, unless a PR already exists. If the project's tracker workflow defines a
+PR-body convention (a Notion/Jira link, say), follow it — the lookup itself belongs to that tracker
+plugin, not here.
+
+```bash
+gh pr create --title "<short title>" --body "$(cat <<'BODY'
 ## Summary
-- <bullet points>
+- <bullets>
 
 ## Test plan
-- <test plan>
-EOF
+- <how it was verified>
+BODY
 )"
 ```
 
-Return the PR URL to the user.
+Return the PR URL.
 
----
+### 7. Watch CI and comments (background)
 
-### Step 7: Wait for CI and code review (background)
+Launch **both** in the background (`run_in_background: true`) and do not poll or sleep:
 
-After pushing, run **both** CI verification and review comment polling concurrently in the background:
+1. `gh run watch`, then `gh run view --log-failed` if it fails
+2. Poll the PR's reviews and comments for up to six minutes
 
-1. **Launch a background agent** that watches CI:
-   - Run `gh run watch` to wait for the latest run to complete
-   - If it fails, capture the failed logs with `gh run view --log-failed`
+You will be notified when each finishes.
 
-2. **Launch a second background agent** that polls for review comments:
-   - Get the PR number with `gh pr view --json number -q '.number'`
-   - Poll every 30 seconds for up to 6 minutes:
-     ```bash
-     gh api repos/{owner}/{repo}/pulls/{pr_number}/reviews
-     gh api repos/{owner}/{repo}/pulls/{pr_number}/comments
-     ```
-   - Collect any comments found
+### 8. Handle what comes back
 
-Both agents run in the background (`run_in_background: true`). You will be notified when each completes — do **not** poll or sleep while waiting.
+- **CI failed** → read the logs, fix, restart from step 3
+- **Comments arrived** → `/dev-loop:review --pr` to triage them into findings, then
+  `/dev-loop:implement --fix`
+- **Green, no comments** → done
 
----
+### 9. Report
 
-### Step 8: Handle results
+PR URL and CI status. Do **not** touch tracker statuses — that belongs to the tracker plugin.
 
-Once both background agents finish:
+## Versioning
 
-- **CI failed**: investigate the logs, fix the issue, and restart from Step 3.
-- **Review comments found**: invoke the `revise` skill to address them.
-- **Both passed with no comments**: proceed to Step 9.
-
----
-
-### Step 9: Done
-
-Report the PR URL and CI status. Do **not** update tracker statuses — that belongs to the project's tracker workflow (e.g. the notion-sprint plugin or an `agile-coach` agent, if the project has one).
+Nothing version-related goes in the PR. Releases happen after merge: a release tag triggers the
+image build, and MajNet consumes it (see the majksa-deploy plugin's `/deploy`). No changesets, no
+version bumps.

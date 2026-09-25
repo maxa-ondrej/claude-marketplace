@@ -32,8 +32,9 @@ If the PR is not merged, tell the user and stop.
    - Move the **story** to its terminal "done" status (e.g. `Done`)
    - Move the **bug** to its terminal "fixed" status (e.g. `✅ Fixed`)
 
-4. Switch back to the main branch and pull latest:
+4. Return to `main` — but only in the main checkout. In a linked worktree (`.git` is a file)
+   `main` is checked out elsewhere and git will refuse; skip this step there.
 
 ```bash
-git checkout main && git pull
+test -f .git || { git checkout main && git pull; }
 ```

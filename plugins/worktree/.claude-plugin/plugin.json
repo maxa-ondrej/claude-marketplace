@@ -1,7 +1,7 @@
 {
   "name": "worktree",
-  "version": "0.1.0",
-  "description": "Spin up an isolated herdr-managed git worktree for a ticket and launch an agent inside it.",
+  "version": "0.2.0",
+  "description": "Tool-agnostic herdr worktree launcher: open a branch in an isolated worktree, run a Claude agent in it with a given prompt, remove the worktree when that agent exits.",
   "author": {
     "name": "Ondrej Maxa"
   }
