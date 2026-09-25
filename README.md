@@ -6,7 +6,7 @@ My personal plugin marketplace for [Claude Code](https://docs.anthropic.com/en/d
 
 | Plugin | What it provides | Depends on |
 |---|---|---|
-| **dev-loop** | The development loop as composable steps: `/research` → `/plan` → `/implement` → `/review`, plus `/ship`. Each writes markdown into `.dev-loop/` that the next one reads. Agent team: architect, designer, developer, tester, reviewer, hater, researcher. Stack conventions come from the host repo's `AGENTS.md`. | — |
+| **dev-loop** | The development loop as composable steps: `/research` → `/plan` → `/implement` → `/review` → `/ship`, with `/work` running the whole chain on one piece of work. Each writes markdown into `.dev-loop/` that the next one reads. Agent team: architect, designer, developer, tester, reviewer, hater, researcher. Stack conventions come from the host repo's `AGENTS.md`. | — |
 | **authoring** | `/create-skill`, `/create-agent` + `meta`, `skill-creator`, `agent-creator` agents for maintaining `.claude/` config and `AGENTS.md` files. | — |
 | **majksa-deploy** | `/deploy` and `/update-deploy-config` through **MajNet** (GitOps): release tags → stable auto-deploys; production via the admin-gated `env/production` render PR in the project's ops repo; config edits on ops `main`. | repo `## Deploy` config; dev-loop's `/ship` merges the change it releases |
 | **notion-sprint** | `/work`, `/complete`, `/reconcile` + `agile-coach` agent for the Notion sprint lifecycle. `/work` picks the ticket and hands it to a worktree agent. | repo `## Sprint` config; worktree; dev-loop |

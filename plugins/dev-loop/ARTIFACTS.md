@@ -1,6 +1,8 @@
 # dev-loop artifacts
 
-Every skill in this plugin reads and writes markdown under `.dev-loop/` at the repo root. That
+Every skill in this plugin reads and writes markdown under `.dev-loop/` at the repo root.
+`/work` runs the whole chain; each step is also runnable on its own, because the handoff is a file
+rather than a conversation. That
 directory is the handoff between skills — `/plan` reads what `/research` wrote, `/implement` reads
 the plan, `/review` writes findings that `/implement` fixes.
 

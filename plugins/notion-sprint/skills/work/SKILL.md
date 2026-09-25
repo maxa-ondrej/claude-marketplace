@@ -73,25 +73,14 @@ Invoke the `agile-coach` agent with `$ARGUMENTS` (the ticket page ID) to fetch t
 tasks, and its description, and to move all statuses to In Progress. It will detect the worktree
 and leave git alone — the branch is already checked out.
 
-### B2. Plan
+### B2. Do the work
 
-Invoke the dev-loop plugin's `/dev-loop:plan` skill with the story/bug description and task list.
-Run `/dev-loop:research` first if the ticket depends on anything unfamiliar.
+Invoke the dev-loop plugin's `/dev-loop:work` skill with the ticket's description and task list.
 
-The plan comes back as a reviewable artifact and needs the user's approval before anything is
-built — that approval happens in this worktree's session, not the one that launched it.
+That runs the whole loop — research if needed, plan (which stops for your approval), implement,
+review and fix until clean, then ship. It reports where it stopped if it stops early.
 
-### B3. Implement and review
-
-1. `/dev-loop:implement` — builds the approved plan
-2. `/dev-loop:review` — writes findings to `.dev-loop/review/`
-3. `/dev-loop:implement --fix` if any `Blocker` or `Must Fix` findings are open, then back to 2
-
-### B4. Ship
-
-Invoke `/dev-loop:ship` to commit, push, open a PR, watch CI, and pull review comments back in.
-
-### B5. Done
+### B3. Done
 
 Invoke the `agile-coach` agent to update final statuses, then report:
 
