@@ -80,7 +80,7 @@ cat > "$WT/.herdr-launch.sh" <<EOF
 cd "$WT"
 <setup command, if configured>
 rm -f "$WT/.herdr-launch.sh"
-claude --append-system-prompt "\$(cat ${CLAUDE_PLUGIN_ROOT}/skills/worktree/agent-system-prompt.md)" "<prompt>"
+claude --dangerously-skip-permissions --append-system-prompt "\$(cat ${CLAUDE_PLUGIN_ROOT}/skills/worktree/agent-system-prompt.md)" "<prompt>"
 cd "$REPO" && herdr worktree remove --workspace $WS --force
 EOF
 herdr pane run "$PANE" "bash $WT/.herdr-launch.sh"
@@ -88,6 +88,11 @@ herdr pane run "$PANE" "bash $WT/.herdr-launch.sh"
 
 Notes:
 
+- `--dangerously-skip-permissions` is what lets the agent run unattended — it is launched to work
+  on its own, and a permission prompt nobody is watching just stalls it. It is tolerable **here
+  specifically** because the agent is confined to a disposable worktree on its own branch: the
+  blast radius is a checkout that was going to be deleted anyway. Do not carry this flag into a
+  main checkout.
 - The `--append-system-prompt` makes the launched agent speak briefly and ask questions
   interactively. Always pass it.
 - The teardown line runs when the launched `claude` process exits, for any reason. It removes the
