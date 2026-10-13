@@ -54,6 +54,19 @@ gh api repos/{owner}/{repo}/pulls/{pr}/reviews
 gh api repos/{owner}/{repo}/pulls/{pr}/comments
 ```
 
+Read the lessons file **before** you draft a single triage decision — not at step 3b, by which
+point a contradicting change is already written:
+
+```bash
+cat "$(git rev-parse --path-format=absolute --git-common-dir)/dev-loop/review-lessons.md" 2>/dev/null
+```
+
+Read it in this thread, not only via the architect: you are the one who tells the user what to
+apply and what to drop. A comment **restating** a recorded lesson confirms it still matters — apply
+it without debate. A comment or a drop you are about to recommend that **contradicts** one gets
+flagged with the lesson quoted, before you recommend anything. The user may still override it;
+they do it knowing the rule exists.
+
 Invoke the `architect` agent to triage them into the same checklist format at
 `.dev-loop/review/pr-comments.md`. It decides which are actionable and drops the ones that
 contradict AGENTS.md or add complexity for its own sake — with a one-line reason for each drop, so

@@ -39,6 +39,10 @@ agent — and hand any failures back to the tester.
 
 ### 4. Implement
 
+The lessons file binds whoever writes the code, not just whoever planned it. The `developer` and
+`tester` agents read it themselves; if you edit directly from this thread instead of delegating,
+read it first — most lessons are about things a plan never mentions.
+
 One `developer` agent **per affected package or app, in parallel** (all Agent calls in one
 message). Each receives the plan filtered to its own scope, the design spec if relevant, and the
 note that tests already exist and must pass.

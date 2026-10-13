@@ -39,6 +39,9 @@ Shipping a known must-fix and hoping the PR reviewer catches it is how it reache
 
 - Stage the relevant files. Never `.env`, credentials, or `.dev-loop/`
 - One concise message saying **why**, not what. Use a HEREDOC to preserve formatting
+- **Plain English, as short as possible.** Short subject line; bullets for the body whenever
+  there is more than one point, prose only when a bullet cannot carry it. Plain words over
+  jargon. Never restate the diff or pad the message to look thorough
 - If the user gave a message in `$ARGUMENTS`, use it
 - No `Co-Authored-By`, `Generated-By`, or AI attribution footers
 
@@ -62,6 +65,9 @@ gh pr create --title "<short title>" --body "$(cat <<'BODY'
 BODY
 )"
 ```
+
+**Plain English, as short as possible, bullets over prose** — same rule as the commit message.
+A short section beats a padded one, and an honestly empty one beats invented content.
 
 Return the PR URL.
 
