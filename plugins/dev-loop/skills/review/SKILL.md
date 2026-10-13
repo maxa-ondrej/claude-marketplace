@@ -48,11 +48,8 @@ Severity is one of `Blocker`, `Must Fix`, `Should Fix`, `Nit`.
 
 ### 3. Pull in PR comments (`--pr` only)
 
-```bash
-gh pr view --json number -q '.number'
-gh api repos/{owner}/{repo}/pulls/{pr}/reviews
-gh api repos/{owner}/{repo}/pulls/{pr}/comments
-```
+Find the PR and read its comments per `FORGE.md` — **The PR for the current branch** and **Read
+review comments**. GitHub and GitLab both work; the file says which commands to use.
 
 Read the lessons file **before** you draft a single triage decision — not at step 3b, by which
 point a contradicting change is already written:

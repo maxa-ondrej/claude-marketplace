@@ -51,19 +51,18 @@ Shipping a known must-fix and hoping the PR reviewer catches it is how it reache
 git push -u origin "$(git branch --show-current)"
 ```
 
-Then `gh pr create`, unless a PR already exists. If the project's tracker workflow defines a
-PR-body convention (a Notion/Jira link, say), follow it — the lookup itself belongs to that tracker
+Then open the PR per `FORGE.md` (**Open a PR**), unless one already exists — `gh` on GitHub,
+`glab` on GitLab. If the project's tracker workflow defines a PR-body convention (a Notion/Jira link, say), follow it — the lookup itself belongs to that tracker
 plugin, not here.
 
-```bash
-gh pr create --title "<short title>" --body "$(cat <<'BODY'
+The body, whichever forge it goes to — pass it with a HEREDOC so the formatting survives:
+
+```markdown
 ## Summary
 - <bullets>
 
 ## Test plan
 - <how it was verified>
-BODY
-)"
 ```
 
 **Plain English, as short as possible, bullets over prose** — same rule as the commit message.
@@ -75,7 +74,7 @@ Return the PR URL.
 
 Launch **both** in the background (`run_in_background: true`) and do not poll or sleep:
 
-1. `gh run watch`, then `gh run view --log-failed` if it fails
+1. Watch CI per `FORGE.md`, and read the failed logs if it fails
 2. Poll the PR's reviews and comments for up to six minutes
 
 You will be notified when each finishes.
