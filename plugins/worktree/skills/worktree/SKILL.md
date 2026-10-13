@@ -1,17 +1,17 @@
 ---
 name: worktree
-description: Opens an isolated herdr git worktree on a branch and launches a Claude agent inside it with a given prompt. Removes the worktree automatically when that agent exits. Tool-agnostic — the branch and prompt are given as arguments; this skill knows nothing about tickets or trackers.
-argument-hint: <branch> [--base <ref>] [--label <text>] -- <prompt for the launched agent>
+description: Opens an isolated herdr git worktree on a branch and launches a Claude agent inside it running /dev-loop:work. Removes the worktree automatically when that agent exits. The branch is given as an argument; an optional trailing prompt overrides the default /dev-loop:work. Knows nothing about tickets or trackers itself.
+argument-hint: <branch> [--base <ref>] [--label <text>] [-- <prompt override>]
 ---
 
 # Worktree Skill
 
-Open a branch in an isolated [herdr](https://herdr.dev) worktree, launch a Claude agent in it with
-a prompt, and tear the worktree down when that agent exits.
+Open a branch in an isolated [herdr](https://herdr.dev) worktree, launch a Claude agent in it
+running `/dev-loop:work`, and tear the worktree down when that agent exits.
 
-This skill **does not select work**. It takes a branch name and a prompt from `$ARGUMENTS`.
-Whoever calls it (a tracker plugin, another skill, or the user) owns ticket selection, branch
-naming, and status updates.
+This skill **does not select work** itself. It takes a branch name from `$ARGUMENTS` and boots the
+launched agent into `/dev-loop:work`, which picks the work up on the other side. Whoever calls it
+(a tracker plugin, another skill, or the user) owns branch naming and status updates.
 
 ## Prerequisites
 
@@ -25,16 +25,21 @@ If it fails, tell the user this skill only runs inside a herdr session and stop.
 
 ## Arguments
 
-`$ARGUMENTS` is `<branch> [--base <ref>] [--label <text>] -- <prompt>`.
+`$ARGUMENTS` is `<branch> [--base <ref>] [--label <text>] [-- <prompt override>]`.
 
 - **branch** (required) — first token. The branch to check out; created from `--base` if it does
   not exist.
-- **--base** *(optional)* — base ref for a new branch. Default `origin/main`.
+- **--base** *(optional)* — base ref for a new branch. Default: the repo's **own** default
+  branch, read from `refs/remotes/origin/HEAD` (see step 1). Never assume `origin/main` — it is
+  `origin/master` in some repos and branching from the wrong base silently produces a huge
+  bogus diff.
 - **--label** *(optional)* — herdr workspace label. Default: the branch name.
-- **prompt** (required) — everything after `--`. The initial prompt the launched agent boots into.
+- **prompt** *(optional)* — everything after `--`. Overrides what the launched agent boots into.
+  Omit it and the agent starts `/dev-loop:work`.
 
-If the branch is missing, ask the user for one. If the prompt is missing, ask what the agent
-should do — do not invent one.
+If the branch is missing, ask the user for one. A missing prompt is **not** an error and needs no
+question — that is the normal case, and the agent boots into `/dev-loop:work`. Only pass an
+override when the caller explicitly supplied one.
 
 ## Optional host-repo config
 
@@ -52,8 +57,29 @@ are optional; with no section, skip straight to the launch.
 
 ```bash
 REPO=$(git rev-parse --show-toplevel)
-herdr worktree create --cwd "$REPO" --branch <branch> --base <base> --label "<label>" --no-focus
+
+# Resolve the base ref. Use the caller's --base if given, otherwise detect the repo's
+# default branch. Do NOT hardcode a guess.
+BASE="<--base value if the caller supplied one, else empty>"
+if [ -z "$BASE" ]; then
+  BASE=$(git -C "$REPO" symbolic-ref --short -q refs/remotes/origin/HEAD)
+  if [ -z "$BASE" ]; then
+    # origin/HEAD is unset in this clone; repair it from the remote, then retry.
+    git -C "$REPO" remote set-head origin --auto >/dev/null 2>&1
+    BASE=$(git -C "$REPO" symbolic-ref --short -q refs/remotes/origin/HEAD)
+  fi
+fi
+if [ -z "$BASE" ]; then
+  echo "cannot determine the default branch - rerun with an explicit --base <ref>" >&2
+  exit 1
+fi
+
+herdr worktree create --cwd "$REPO" --branch <branch> --base "$BASE" --label "<label>" --no-focus
 ```
+
+Fail loudly rather than falling back to a literal. A wrong base is not a small error: the new
+branch forks from the wrong history and every later diff, MR and review is against the wrong
+baseline.
 
 From the JSON response capture:
 
@@ -88,6 +114,9 @@ herdr pane run "$PANE" "bash $WT/.herdr-launch.sh"
 
 Notes:
 
+- `<prompt>` is the override if the caller gave one after `--`, otherwise the literal
+  `/dev-loop:work`. Substitute the chosen text into the launcher before writing it — do not emit
+  the placeholder.
 - `--dangerously-skip-permissions` is what lets the agent run unattended — it is launched to work
   on its own, and a permission prompt nobody is watching just stalls it. It is tolerable **here
   specifically** because the agent is confined to a disposable worktree on its own branch: the
