@@ -83,8 +83,8 @@ You will be notified when each finishes.
 ### 8. Handle what comes back
 
 - **CI failed** → read the logs, fix, restart from step 3
-- **Comments arrived** → `/dev-loop:review --pr` to triage them into findings, then
-  `/dev-loop:implement --fix`
+- **Comments arrived** → `/dev-loop:address-review`, which triages, fixes, ships, and answers the
+  threads. Only reaching for the pieces? `/dev-loop:review --pr` then `/dev-loop:implement --fix`
 - **Green, no comments** → done
 
 ### 9. Report
