@@ -1,9 +1,8 @@
 {
   "name": "mac-notify",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "macOS notification (with sound) whenever Claude Code needs your attention.",
   "author": {
     "name": "Ondrej Maxa"
-  },
-  "hooks": "./hooks/hooks.json"
+  }
 }
