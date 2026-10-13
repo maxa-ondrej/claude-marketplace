@@ -41,7 +41,7 @@ Nothing to apply (every comment dropped or answered in words)? Skip to step 4.
 
 Review comments live on threads. Fetch them with their ids — **Threads** in `FORGE.md`.
 
-Skip threads already resolved, and the ones that cannot be resolved at all (GitLab system notes).
+Skip threads already resolved, and GitLab system notes — those are not comments.
 Pair each remaining one with its triage outcome and commit SHA. Top-level PR comments are not
 threads — answer those with the plain comment command at the end.
 
@@ -49,17 +49,22 @@ Then, **one thread at a time, in order**:
 
 1. Print the thread: author, `path:line`, the comment, and its outcome — `Fixed in <sha>` or
    `Dropped: <reason>`.
-2. Draft the reply you *would* send. Fixed → what changed and the SHA. Dropped → why, plainly, no
-   defensiveness. Plain English, as short as stays accurate.
-3. Ask with `AskUserQuestion`: **Reply & resolve** / **Reply only** / **Resolve only** / **Nothing**.
-   They may pick Other to edit the wording — show the revised draft and treat their choice as
-   applying to that.
-4. Act on the answer before moving on, using **Reply into a thread** and **Resolve a thread** from
-   `FORGE.md`. Reply first, then resolve, when they chose both.
+2. Draft the reply. Fixed → what changed and the SHA. Dropped → why, plainly, no defensiveness.
 
-Offer resolve only for a thread that can be resolved; for the rest the choice is reply or nothing.
+   **Write it in simple English. Short.** One or two sentences is the normal length. Say what you
+   did, not how you thought about it. No jargon the reviewer did not use, no hedging, no thanking
+   them for the "great catch". If the draft runs past three sentences, cut it.
 
-A thread the user leaves untouched stays open. That is a valid answer, not a failure.
+3. Ask with `AskUserQuestion` whether to send it: **Send** / **Edit** / **Skip**. On Edit, take
+   their wording, show it back, and ask again. Post only what they approved, with **Reply into a
+   thread** from `FORGE.md`.
+4. **Then always ask, separately: resolve this thread too?** Every thread, whether you replied or
+   skipped — never bundle it into the reply question, and never resolve because replying seemed to
+   settle it. Yes → **Resolve a thread** in `FORGE.md`. No → leave it open.
+
+   Skip only this question for a thread that cannot be resolved (a GitLab system note), and say why.
+
+A thread left open is a valid answer, not a failure.
 
 ### 5. Report
 
