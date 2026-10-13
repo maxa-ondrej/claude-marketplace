@@ -10,7 +10,8 @@ Find what is wrong with the code that was just written, and leave it on disk in 
 `/dev-loop:implement --fix` can consume.
 
 **Outputs:** `.dev-loop/review/reviewer.md`, `.dev-loop/review/hater.md`, and with `--pr`,
-`.dev-loop/review/pr-comments.md`
+`.dev-loop/review/pr-comments.md` plus any approved lessons appended to the repo's review-lessons
+file (see `ARTIFACTS.md`).
 
 ## Execution
 
@@ -61,13 +62,49 @@ you can answer the reviewer.
 Human comments outrank both agents. A person who left a comment gets an answer even when the
 architect drops it.
 
+### 3b. Distill durable lessons (`--pr` only)
+
+Some comments are one-off ("typo here"). Others state a standing preference the reviewer will raise
+again next PR — a naming rule, a testing expectation, an error-handling pattern. Record those so
+`architect` plans around them and `reviewer` enforces them.
+
+A candidate lesson must be reusable across PRs, phrased as an imperative rule rather than a diff
+("prefer the repository finder over hand-written queries for single-row lookups", not "change line
+42"), and free of secrets, ticket IDs, and verbatim comment text. If nothing generalizes, skip this
+step silently.
+
+Read the existing file and mark each candidate **new**, **merge** (refines an entry already there),
+or **already covered** (drop it):
+
+```bash
+LESSONS="$(git rev-parse --path-format=absolute --git-common-dir)/dev-loop/review-lessons.md"
+cat "$LESSONS" 2>/dev/null
+```
+
+`--git-common-dir` resolves to the main repo's `.git` even from a worktree, so every worktree of
+this repo shares one file and it is never committed.
+
+Then ask the user, via `AskUserQuestion`, which to save. **Never write a lesson the user has not
+approved in the wording they saw.** Approved ones go under their category heading — rewrite the
+existing bullet in place for a merge, never duplicate it:
+
+```markdown
+# Review Lessons
+
+## Tests
+- Cover the error path, not just the happy path, for every new failure mode _(reviewer: <name>, <date>)_
+```
+
+Create the directory only when there is something to write (`mkdir -p "$(dirname "$LESSONS")"`), and
+date entries with `date +%F`.
+
 ### 4. Report
 
 A count per severity per file, and the paths. Do not print the findings into chat — they are in the
 files, and reprinting them is how a twenty-nit list buries the one blocker.
 
 Then tell the user their options: `/dev-loop:implement --fix` to fix the must-fixes, or read the
-files first.
+files first. With `--pr`, also name the lessons saved — or say none generalized.
 
 ### 5. Fix loop
 

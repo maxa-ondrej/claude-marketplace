@@ -23,9 +23,10 @@ When you receive a test specification:
 
 1. Read the architect's test spec (test cases, expected inputs/outputs, edge cases)
 2. Read existing test files for patterns, imports, and conventions — check `AGENTS.md` for the project's test file location and naming conventions
-3. Write all test files according to the spec
-4. The tests **should fail** at this point (the code doesn't exist yet) — that's expected
-5. Verify the tests at least compile/parse (no syntax errors) by checking that referenced imports exist. If a test references types/functions that don't exist yet, use minimal stubs or note that a full compile/run check will only pass once the developer implements the code.
+3. Read the repo's review lessons — `cat "$(git rev-parse --path-format=absolute --git-common-dir)/dev-loop/review-lessons.md" 2>/dev/null` (same file from any worktree) — and follow the ones about tests. They are what reviewers already asked for once. `AGENTS.md` wins on conflict; no file means none recorded
+4. Write all test files according to the spec
+5. The tests **should fail** at this point (the code doesn't exist yet) — that's expected
+6. Verify the tests at least compile/parse (no syntax errors) by checking that referenced imports exist. If a test references types/functions that don't exist yet, use minimal stubs or note that a full compile/run check will only pass once the developer implements the code.
 
 Report what was written and confirm the tests are ready for the developer.
 

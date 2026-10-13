@@ -43,7 +43,24 @@ Read each changed file in full to understand the context around the changes — 
 
 Read `AGENTS.md` (and any nested package/app `AGENTS.md`) and verify, for each changed file, that it follows the project's documented conventions: naming, import style, module boundaries, error-handling patterns, state-management patterns, and anything else the project explicitly documents.
 
-### 3. Review criteria
+### 3. Check the review lessons
+
+```bash
+cat "$(git rev-parse --path-format=absolute --git-common-dir)/dev-loop/review-lessons.md" 2>/dev/null
+```
+
+Same file for every worktree of this repo (`--git-common-dir` resolves to the main repo's `.git`).
+It records what past reviewers asked for. Check the diff against every lesson and raise a finding
+for each one it breaks, tagged `(lesson)` so the caller can see it came from remembered feedback:
+
+```markdown
+- [ ] **Must Fix** `src/foo.ts:42` — (lesson) hand-written query where a repository finder exists
+      → Fix: use `findOneByX`
+```
+
+`AGENTS.md` wins on conflict. Missing file means no lessons yet — skip this step.
+
+### 4. Review criteria
 
 - **Correctness** — Does it work? Are edge cases handled?
 - **Conventions** — Follows the project's documented code style and patterns?
@@ -52,7 +69,7 @@ Read `AGENTS.md` (and any nested package/app `AGENTS.md`) and verify, for each c
 - **Performance** — No unnecessary re-renders, N+1 queries/network calls, or memory leaks.
 - **Testing** — Are the tests adequate for the change (happy path, error path, edge cases)?
 
-### 4. Check for common mistakes
+### 5. Check for common mistakes
 
 - Stale build artifacts after changes to a shared/generated package (missing rebuild)
 - Forgetting to export new types/functions from the module's public entry point

@@ -31,3 +31,27 @@ what is left:
 - [ ] **Must Fix** `src/foo.ts:42` — loop assumes a non-empty list; throws on `[]`
       → Fix: guard with an early return
 ```
+
+## Review lessons
+
+Durable reviewer preferences — the rules a reviewer should never have to raise twice — live outside
+`.dev-loop/`, because they outlive the branch:
+
+```bash
+"$(git rev-parse --path-format=absolute --git-common-dir)/dev-loop/review-lessons.md"
+```
+
+`--git-common-dir` resolves to the **main** repo's `.git` even from inside a worktree, so every
+worktree of a repo reads and writes the same file, and it is never committed. One file per
+repository.
+
+`architect` reads it while planning, `developer` and `tester` while writing — most lessons are about
+things a plan never mentions — and `reviewer` enforces it, tagging any finding that came from one.
+`/review --pr` is the only thing that writes it, and only with per-lesson user approval.
+
+```markdown
+# Review Lessons
+
+## <Category — Naming / Tests / Error handling / Architecture / Performance>
+- <lesson, imperative> _(reviewer: <name>, <YYYY-MM-DD>)_
+```

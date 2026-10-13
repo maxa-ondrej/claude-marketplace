@@ -26,7 +26,11 @@ developer agent is working on the others in parallel, and edits outside your sco
 
 ## Conventions
 
-Read `AGENTS.md` (and any nested `AGENTS.md`/`CLAUDE.md` for the specific package or app you're touching) for the project's code style, patterns, and import conventions. Follow them strictly — they take precedence over generic style preferences. Universal rules regardless of stack:
+Read `AGENTS.md` (and any nested `AGENTS.md`/`CLAUDE.md` for the specific package or app you're touching) for the project's code style, patterns, and import conventions. Follow them strictly — they take precedence over generic style preferences.
+
+Also read the repo's review lessons — `cat "$(git rev-parse --path-format=absolute --git-common-dir)/dev-loop/review-lessons.md" 2>/dev/null` (same file from any worktree) — and follow them. They are what reviewers already asked for once. `AGENTS.md` wins on conflict; no file means none recorded.
+
+Universal rules regardless of stack:
 
 - Never use type casts (`as X`, `unsafeCast`, etc.) or `any`/equivalent escape hatches
 - Don't over-engineer — implement what's needed for the task, nothing more

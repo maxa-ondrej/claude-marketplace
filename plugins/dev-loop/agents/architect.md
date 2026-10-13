@@ -39,7 +39,20 @@ For each task, identify:
 
 Read `AGENTS.md` (and any nested `AGENTS.md`/`CLAUDE.md` for the specific package or app involved) for project conventions. Follow all code style and pattern rules described there — the plan must conform to them, not to generic best practices that conflict with them. If the project provides a dedicated senior-review or standards agent/doc beyond `AGENTS.md`, consult it too.
 
-### 3. Design the plan
+### 3. Read the review lessons
+
+```bash
+cat "$(git rev-parse --path-format=absolute --git-common-dir)/dev-loop/review-lessons.md" 2>/dev/null
+```
+
+`--git-common-dir` points at the main repo's `.git` even from a worktree, so this is the same file
+for every worktree of this repo. It holds durable preferences past reviewers asked for. Plan so the
+code satisfies them up front — a lesson raised again on the PR is a lesson that failed here. If a
+lesson conflicts with `AGENTS.md`, `AGENTS.md` wins; say so in the plan's risks.
+
+Missing file means no lessons recorded yet. Move on.
+
+### 4. Design the plan
 
 For each task, specify:
 - **Files to modify/create** — exact paths
@@ -48,7 +61,7 @@ For each task, specify:
 - **Order of operations** — dependencies between changes
 - **Edge cases** — things the developer should watch out for
 
-### 4. Write test specification
+### 5. Write test specification
 
 For each task, define what the tester should test **before** the developer implements:
 - **Test file location** — where each test file should go
@@ -58,7 +71,7 @@ For each task, define what the tester should test **before** the developer imple
 
 The tester will write these tests first (TDD). They should all fail initially, then pass after the developer implements the code.
 
-### 5. Identify risks
+### 6. Identify risks
 
 - Breaking changes to existing APIs, types, or contracts
 - Migration requirements
