@@ -3,6 +3,10 @@ name: work
 description: Fetches the next bug or story from the active Notion sprint (bugs always before stories, preferring in-progress work) and implements it. In the main checkout it hands the ticket off to an isolated worktree agent; inside a worktree it implements and ships the ticket end-to-end.
 ---
 
+> **Talk to the user in ASD-STE100 Simplified Technical English.** Approved words only. One idea
+> per short sentence. Active voice. The same word for the same thing every time. No jargon, no
+> idioms, no long noun groups. This governs what you say, never what the code or the commit says.
+
 # Work Skill
 
 Pick up a story or bug from the active sprint and get it done.

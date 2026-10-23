@@ -1,6 +1,6 @@
 {
   "name": "diagnose",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Read-only production diagnosis via SigNoz (logs/traces), Coolify deploy state, and Postgres.",
   "author": {
     "name": "Ondrej Maxa"

@@ -3,6 +3,10 @@ name: address-review
 description: Address the review comments on the current PR or MR — triage them, fix them, ship, then go thread by thread letting you reply and resolve each one. Works on GitHub and GitLab. Use when the user asks to address, apply, or answer PR/MR review comments or feedback.
 ---
 
+> **Talk to the user in ASD-STE100 Simplified Technical English.** Approved words only. One idea
+> per short sentence. Active voice. The same word for the same thing every time. No jargon, no
+> idioms, no long noun groups. This governs what you say, never what the code or the commit says.
+
 # Address Review Skill
 
 Take the human comments on the current PR all the way to answered threads.

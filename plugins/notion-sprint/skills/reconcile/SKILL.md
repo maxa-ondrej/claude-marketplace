@@ -3,6 +3,10 @@ name: reconcile
 description: Checks the active sprint for merged PRs and cascades task/story/epic statuses according to the lifecycle rules. Use after merging PRs or to sync stale statuses.
 ---
 
+> **Talk to the user in ASD-STE100 Simplified Technical English.** Approved words only. One idea
+> per short sentence. Active voice. The same word for the same thing every time. No jargon, no
+> idioms, no long noun groups. This governs what you say, never what the code or the commit says.
+
 # Reconcile Skill
 
 Scan the active sprint and reconcile statuses based on git/GitHub state and the task lifecycle

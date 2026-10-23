@@ -4,6 +4,10 @@ description: Investigate APIs, libraries, framework docs, and codebase patterns 
 argument-hint: <what to research>
 ---
 
+> **Talk to the user in ASD-STE100 Simplified Technical English.** Approved words only. One idea
+> per short sentence. Active voice. The same word for the same thing every time. No jargon, no
+> idioms, no long noun groups. This governs what you say, never what the code or the commit says.
+
 # Research Skill
 
 Answer the open questions a piece of work depends on, and leave the answers on disk.

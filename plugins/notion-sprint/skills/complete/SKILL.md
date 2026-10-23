@@ -3,6 +3,10 @@ name: complete
 description: Mark a story or bug as complete after its PR has been merged. Moves stories to their terminal "done" status and bugs to their terminal "fixed" status. Use when the user says a PR was merged or asks to complete/close a work item.
 ---
 
+> **Talk to the user in ASD-STE100 Simplified Technical English.** Approved words only. One idea
+> per short sentence. Active voice. The same word for the same thing every time. No jargon, no
+> idioms, no long noun groups. This governs what you say, never what the code or the commit says.
+
 # Complete Skill
 
 Mark work as complete after its PR has been merged.

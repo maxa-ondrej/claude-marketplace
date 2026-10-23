@@ -4,6 +4,10 @@ description: Review the current changes through two lenses — conventions/quali
 argument-hint: [--pr] [files or focus]
 ---
 
+> **Talk to the user in ASD-STE100 Simplified Technical English.** Approved words only. One idea
+> per short sentence. Active voice. The same word for the same thing every time. No jargon, no
+> idioms, no long noun groups. This governs what you say, never what the code or the commit says.
+
 # Review Skill
 
 Find what is wrong with the code that was just written, and leave it on disk in a form

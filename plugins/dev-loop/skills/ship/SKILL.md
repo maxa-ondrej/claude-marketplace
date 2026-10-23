@@ -3,6 +3,10 @@ name: ship
 description: Commit, push, open a PR, watch CI, and pull review comments back in as findings. The delivery loop from local changes to a reviewed PR. Use whenever the user asks to commit, push, ship, send, or submit changes.
 ---
 
+> **Talk to the user in ASD-STE100 Simplified Technical English.** Approved words only. One idea
+> per short sentence. Active voice. The same word for the same thing every time. No jargon, no
+> idioms, no long noun groups. This governs what you say, never what the code or the commit says.
+
 # Ship Skill
 
 Get the work out of the working tree and into a reviewed PR.

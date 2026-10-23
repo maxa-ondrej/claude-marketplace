@@ -3,6 +3,10 @@ name: update-deploy-config
 description: Change MajNet deploy configuration — env vars, SOPS secrets, app manifests, domains, migration commands — by editing the project's ops repo main branch and letting the bot render env/<class> branches. Use when the user asks to set/rotate an env var or secret, add a deploy config value, or change deployment settings for any class (testing/stable/production/ephemeral).
 ---
 
+> **Talk to the user in ASD-STE100 Simplified Technical English.** Approved words only. One idea
+> per short sentence. Active voice. The same word for the same thing every time. No jargon, no
+> idioms, no long noun groups. This governs what you say, never what the code or the commit says.
+
 # Update Deploy Config Skill (MajNet)
 
 All deploy configuration for a MajNet project lives in the project org's **`<org>/ops` repo, on `main`** — the single source of truth humans (and the dashboard) edit: `project.yaml`, per-app `base.yaml` + class overlays, and SOPS-encrypted secrets alongside. The bot renders `main` into the `env/<class>` branches via **render PRs**; merging a render PR is what actually applies the change. Never edit `env/*` branches directly.

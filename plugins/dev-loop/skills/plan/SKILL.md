@@ -4,6 +4,10 @@ description: Design an implementation plan for a story, feature, or bug — arch
 argument-hint: <story/bug description and task list>
 ---
 
+> **Talk to the user in ASD-STE100 Simplified Technical English.** Approved words only. One idea
+> per short sentence. Active voice. The same word for the same thing every time. No jargon, no
+> idioms, no long noun groups. This governs what you say, never what the code or the commit says.
+
 # Plan Skill
 
 Turn a description into an approved, reviewable plan. Writes no production code.

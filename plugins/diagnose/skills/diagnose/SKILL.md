@@ -3,6 +3,10 @@ name: diagnose
 description: Diagnose a running issue in this repo's services — errors, bad behaviour, "why did X happen", or a failed Coolify deployment. Routes read-only investigation to the right source (SigNoz for logs/traces, the Coolify CLI for deploy state, Postgres for data) and includes the full Coolify deploy-failure root-cause procedure (classify transient infra vs real code/migration defect, recommend fix or redeploy). Use when the user says "look into", "check logs", "why did this happen", "deploy/preview failed", "why did Coolify fail", or asks to investigate live behaviour. READ-ONLY; to change deploy config use the majksa-deploy plugin's update-deploy-config skill.
 ---
 
+> **Talk to the user in ASD-STE100 Simplified Technical English.** Approved words only. One idea
+> per short sentence. Active voice. The same word for the same thing every time. No jargon, no
+> idioms, no long noun groups. This governs what you say, never what the code or the commit says.
+
 # Diagnose Skill
 
 Investigate a live problem in this repo's deployed services and route it to the correct

@@ -4,6 +4,10 @@ description: Build an approved plan — tests first, then code, one developer pe
 argument-hint: [nothing — builds .dev-loop/plan.md] | --fix
 ---
 
+> **Talk to the user in ASD-STE100 Simplified Technical English.** Approved words only. One idea
+> per short sentence. Active voice. The same word for the same thing every time. No jargon, no
+> idioms, no long noun groups. This governs what you say, never what the code or the commit says.
+
 # Implement Skill
 
 Write the code. Two modes:
@@ -31,8 +35,10 @@ Skip if the plan touches no such package.
 
 ### 3. Tests first
 
-Invoke the `tester` agent in **TDD mode** with the plan's test specification. It writes every test
-file before any implementation. They fail. That is the point.
+Invoke the `tester` agent in **TDD mode** with the plan's test specification. It writes the tests
+before any implementation. They fail. That is the point.
+
+Basics only: the main path, plus each way the change can realistically fail. Not a case per branch.
 
 Then run the repo's format and typecheck commands (from AGENTS.md) yourself — a Bash call, not an
 agent — and hand any failures back to the tester.
@@ -57,7 +63,8 @@ calls from this thread — there is no agent for running a command and reading i
 On failure, hand the errors to the `developer` agent that owns those files, then re-run. Repeat
 until green. No round limit.
 
-Then invoke the `tester` agent in **verify mode** to fill coverage gaps the plan's spec missed.
+Then invoke the `tester` agent in **verify mode**. It adds a test only where something basic is
+untested — not wherever coverage is below some number. "Nothing to add" is a valid result.
 
 ### 6. Write the summary
 

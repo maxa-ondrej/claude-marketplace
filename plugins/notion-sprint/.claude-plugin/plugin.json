@@ -1,6 +1,6 @@
 {
   "name": "notion-sprint",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Notion sprint lifecycle: pick up work, complete items, reconcile statuses after merges. Board/database specifics read from the host repo's config section.",
   "author": {
     "name": "Ondrej Maxa"

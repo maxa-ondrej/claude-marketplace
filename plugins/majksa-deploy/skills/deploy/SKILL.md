@@ -3,6 +3,10 @@ name: deploy
 description: Release the merged main branch through MajNet — cut release tags (stable auto-deploys), then promote to production via the admin-gated env/production render PR in the project's ops repo. Use when the user says "deploy", "release", "ship to prod", "cut a release", or "promote to production".
 ---
 
+> **Talk to the user in ASD-STE100 Simplified Technical English.** Approved words only. One idea
+> per short sentence. Active voice. The same word for the same thing every time. No jargon, no
+> idioms, no long noun groups. This governs what you say, never what the code or the commit says.
+
 # Deploy Skill (MajNet)
 
 Release a project's `main` branch through **MajNet** — the GitOps platform (source: `~/Projects/majnet`, design in `docs/design.md`, ADR 0009/0018). Each project is a GitHub org with a platform-managed `<org>/ops` repo; the `env/<class>` branches there are rendered output, and **merging a render PR is the deploy trigger**.
