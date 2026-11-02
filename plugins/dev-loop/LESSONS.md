@@ -43,6 +43,24 @@ Lessons with the repository `(all repos)` apply to every repository. Read them t
 `Name` is the short rule. `Lesson` is the full text. One lesson of 2000 characters or more
 continues in the page body — read the page only when you must.
 
+## Stronger lessons beat weaker ones
+
+`Review level` says how much weight a lesson carries. From strongest to weakest:
+
+1. `second lvl` — a second-level reviewer asked for it
+2. `first lvl` — a first-level reviewer asked for it
+3. `self review` — the user wrote it for themselves
+4. `bot / AI` — a bot raised it
+
+Use this order every time, not only when two lessons disagree:
+
+- **A conflict is settled by level.** The stronger lesson wins. Say which one you followed and why.
+- **Read strongest first** when there are more lessons than you can hold. A `second lvl` lesson you
+  missed becomes a review comment; a `bot / AI` lesson you missed usually does not.
+- **`reviewer` grades by level too.** A broken `second lvl` lesson is a Must Fix. A broken
+  `bot / AI` lesson is a Nit, unless the code is wrong for some other reason as well.
+- `AGENTS.md` still beats every level.
+
 `AGENTS.md` has control if a lesson does not agree with it.
 
 ## Add a lesson
@@ -55,10 +73,17 @@ notion db add <db-id> \
   "Category=<a category that exists>" \
   "Repo=<group>/<name>" \
   "Lesson=<the full rule>" \
-  "Reviewer=<name>" \
+  "Authors=<name>[,<name>]" \
+  "Review level=<bot / AI | self review | first lvl | second lvl>" \
   "Date=$(date +%F)"
 ```
 
 Use a category that exists. A new category needs the user to agree first.
+
+`Authors` is everyone who asked for the rule. `Review level` is the **highest** level among them:
+a lesson from the user and a second-level reviewer together is `second lvl`. Use `self review` only
+when the user is the one author, and `bot / AI` only when every author is a bot.
+
+`Created at` and `Last updated` fill in on their own. Do not set them.
 
 To make a lesson better, change that row. Do not add a row that is almost the same.
