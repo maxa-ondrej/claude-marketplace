@@ -34,24 +34,9 @@ what is left:
 
 ## Review lessons
 
-Durable reviewer preferences — the rules a reviewer should never have to raise twice — live outside
-`.dev-loop/`, because they outlive the branch:
+Lessons do not live in `.dev-loop/`. They live in a Notion database, because they outlive the
+branch and apply to every clone. `LESSONS.md` in this plugin has the commands and the rules.
 
-```bash
-"$(git rev-parse --path-format=absolute --git-common-dir)/dev-loop/review-lessons.md"
-```
-
-`--git-common-dir` resolves to the **main** repo's `.git` even from inside a worktree, so every
-worktree of a repo reads and writes the same file, and it is never committed. One file per
-repository.
-
-`architect` reads it while planning, `developer` and `tester` while writing — most lessons are about
-things a plan never mentions — and `reviewer` enforces it, tagging any finding that came from one.
-`/review --pr` is the only thing that writes it, and only with per-lesson user approval.
-
-```markdown
-# Review Lessons
-
-## <Category — Naming / Tests / Error handling / Architecture / Performance>
-- <lesson, imperative> _(reviewer: <name>, <YYYY-MM-DD>)_
-```
+`architect` reads them when it plans. `developer` and `tester` read them when they write.
+`reviewer` applies them and marks each finding that comes from one. `/review --pr` is the only
+writer, and only with the user's approval for each lesson.

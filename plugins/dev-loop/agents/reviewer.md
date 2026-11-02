@@ -49,13 +49,9 @@ Read `AGENTS.md` (and any nested package/app `AGENTS.md`) and verify, for each c
 
 ### 3. Check the review lessons
 
-```bash
-cat "$(git rev-parse --path-format=absolute --git-common-dir)/dev-loop/review-lessons.md" 2>/dev/null
-```
-
-Same file for every worktree of this repo (`--git-common-dir` resolves to the main repo's `.git`).
-It records what past reviewers asked for. Check the diff against every lesson and raise a finding
-for each one it breaks, tagged `(lesson)` so the caller can see it came from remembered feedback:
+Read them from Notion — see `LESSONS.md` in this plugin for the commands. They record what past
+reviewers asked for. Check the diff against each lesson. Write a finding for each lesson the diff
+breaks, and mark it `(lesson)` so the caller sees where it came from:
 
 ```markdown
 - [ ] **Must Fix** `src/foo.ts:42` — (lesson) hand-written query where a repository finder exists

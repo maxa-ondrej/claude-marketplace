@@ -38,7 +38,7 @@ When you receive a test specification:
 
 1. Read the architect's test spec (test cases, expected inputs/outputs, edge cases)
 2. Read existing test files for patterns, imports, and conventions — check `AGENTS.md` for the project's test file location and naming conventions
-3. Read the repo's review lessons — `cat "$(git rev-parse --path-format=absolute --git-common-dir)/dev-loop/review-lessons.md" 2>/dev/null` (same file from any worktree) — and follow the ones about tests. They are what reviewers already asked for once. `AGENTS.md` wins on conflict; no file means none recorded
+3. Read the review lessons from Notion — `LESSONS.md` in this plugin has the commands — and obey the ones about tests. They are what reviewers asked for one time already. `AGENTS.md` has control if a lesson does not agree with it
 4. Write the test files. Follow the spec, but cut any case that does not earn its place — report what you cut and why
 5. The tests **should fail** at this point (the code doesn't exist yet) — that's expected
 6. Verify the tests at least compile/parse (no syntax errors) by checking that referenced imports exist. If a test references types/functions that don't exist yet, use minimal stubs or note that a full compile/run check will only pass once the developer implements the code.

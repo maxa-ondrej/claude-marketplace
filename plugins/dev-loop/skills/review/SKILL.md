@@ -14,8 +14,8 @@ Find what is wrong with the code that was just written, and leave it on disk in 
 `/dev-loop:implement --fix` can consume.
 
 **Outputs:** `.dev-loop/review/reviewer.md`, `.dev-loop/review/hater.md`, and with `--pr`,
-`.dev-loop/review/pr-comments.md` plus any approved lessons appended to the repo's review-lessons
-file (see `ARTIFACTS.md`).
+`.dev-loop/review/pr-comments.md` plus any approved lessons added to the Notion lessons database
+(see `LESSONS.md`).
 
 ## Execution
 
@@ -55,18 +55,15 @@ Severity is one of `Blocker`, `Must Fix`, `Should Fix`, `Nit`.
 Find the PR and read its comments per `FORGE.md` — **The PR for the current branch** and **Read
 review comments**. GitHub and GitLab both work; the file says which commands to use.
 
-Read the lessons file **before** you draft a single triage decision — not at step 3b, by which
-point a contradicting change is already written:
+Read the lessons **before** you make one triage decision — not at step 3b, because by then the
+change that disagrees with a lesson is already written. `LESSONS.md` in this plugin has the
+commands.
 
-```bash
-cat "$(git rev-parse --path-format=absolute --git-common-dir)/dev-loop/review-lessons.md" 2>/dev/null
-```
-
-Read it in this thread, not only via the architect: you are the one who tells the user what to
-apply and what to drop. A comment **restating** a recorded lesson confirms it still matters — apply
-it without debate. A comment or a drop you are about to recommend that **contradicts** one gets
-flagged with the lesson quoted, before you recommend anything. The user may still override it;
-they do it knowing the rule exists.
+Read them in this thread, not only through the architect: you tell the user what to apply and what
+to drop. A comment that **repeats** a recorded lesson shows the lesson is still correct — apply it.
+A comment, or a drop you want to recommend, that **disagrees** with a lesson gets a flag and the
+lesson quoted, before you recommend it. The user can still decide against the lesson. They decide
+with the rule in view.
 
 Invoke the `architect` agent to triage them into the same checklist format at
 `.dev-loop/review/pr-comments.md`. It decides which are actionable and drops the ones that
@@ -87,30 +84,14 @@ A candidate lesson must be reusable across PRs, phrased as an imperative rule ra
 42"), and free of secrets, ticket IDs, and verbatim comment text. If nothing generalizes, skip this
 step silently.
 
-Read the existing file and mark each candidate **new**, **merge** (refines an entry already there),
-or **already covered** (drop it):
+Read the lessons that are already there (`LESSONS.md` has the commands) and mark each candidate
+**new**, **merge** (it makes a row that exists better), or **already there** (drop it).
 
-```bash
-LESSONS="$(git rev-parse --path-format=absolute --git-common-dir)/dev-loop/review-lessons.md"
-cat "$LESSONS" 2>/dev/null
-```
+Then ask the user with `AskUserQuestion` which ones to save. **Never write a lesson the user did
+not approve, in words the user did not see.**
 
-`--git-common-dir` resolves to the main repo's `.git` even from a worktree, so every worktree of
-this repo shares one file and it is never committed.
-
-Then ask the user, via `AskUserQuestion`, which to save. **Never write a lesson the user has not
-approved in the wording they saw.** Approved ones go under their category heading — rewrite the
-existing bullet in place for a merge, never duplicate it:
-
-```markdown
-# Review Lessons
-
-## Tests
-- Cover the error path, not just the happy path, for every new failure mode _(reviewer: <name>, <date>)_
-```
-
-Create the directory only when there is something to write (`mkdir -p "$(dirname "$LESSONS")"`), and
-date entries with `date +%F`.
+Add each approved lesson as one row. For a merge, change the row that exists — never add a row
+that is almost the same.
 
 ### 4. Report
 

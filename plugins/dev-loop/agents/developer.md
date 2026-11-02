@@ -32,7 +32,7 @@ developer agent is working on the others in parallel, and edits outside your sco
 
 Read `AGENTS.md` (and any nested `AGENTS.md`/`CLAUDE.md` for the specific package or app you're touching) for the project's code style, patterns, and import conventions. Follow them strictly — they take precedence over generic style preferences.
 
-Also read the repo's review lessons — `cat "$(git rev-parse --path-format=absolute --git-common-dir)/dev-loop/review-lessons.md" 2>/dev/null` (same file from any worktree) — and follow them. They are what reviewers already asked for once. `AGENTS.md` wins on conflict; no file means none recorded.
+Also read the review lessons from Notion — `LESSONS.md` in this plugin has the commands — and obey them. They are what reviewers asked for one time already. `AGENTS.md` has control if a lesson does not agree with it. No lessons, or no Notion access: continue without them.
 
 Universal rules regardless of stack:
 

@@ -45,16 +45,12 @@ Read `AGENTS.md` (and any nested `AGENTS.md`/`CLAUDE.md` for the specific packag
 
 ### 3. Read the review lessons
 
-```bash
-cat "$(git rev-parse --path-format=absolute --git-common-dir)/dev-loop/review-lessons.md" 2>/dev/null
-```
+Read them from Notion — see `LESSONS.md` in this plugin for the commands. They hold what past
+reviewers asked for. Plan so the code satisfies them from the start: a lesson given again on the PR
+is a lesson that failed here. If a lesson does not agree with `AGENTS.md`, `AGENTS.md` has control;
+write that in the plan's risks.
 
-`--git-common-dir` points at the main repo's `.git` even from a worktree, so this is the same file
-for every worktree of this repo. It holds durable preferences past reviewers asked for. Plan so the
-code satisfies them up front — a lesson raised again on the PR is a lesson that failed here. If a
-lesson conflicts with `AGENTS.md`, `AGENTS.md` wins; say so in the plan's risks.
-
-Missing file means no lessons recorded yet. Move on.
+No lessons, or no Notion access? Continue without them.
 
 ### 4. Design the plan
 
