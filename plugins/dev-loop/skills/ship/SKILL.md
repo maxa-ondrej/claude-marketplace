@@ -32,6 +32,13 @@ Skip silently if neither exists.
 Run the repo's format, codegen, typecheck, and test commands (from AGENTS.md). All four must pass.
 Stage anything format or codegen rewrote.
 
+**Use the repo's own verification agents when it has them.** Look in `.claude/agents/` at the repo
+root and in the package directory you are verifying. A repo that ships an agent for its linter,
+type checker or test runner knows something the raw command does not — how to read its output, and
+how to fix what it finds. Invoke those agents in parallel, one message, instead of the bare
+commands. Run the bare commands only for what no agent covers.
+
+
 ### 4. Review before pushing
 
 Run `/dev-loop:review`. If it leaves unchecked `Blocker` or `Must Fix` findings, run

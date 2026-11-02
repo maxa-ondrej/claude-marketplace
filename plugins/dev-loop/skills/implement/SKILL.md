@@ -40,8 +40,8 @@ before any implementation. They fail. That is the point.
 
 Basics only: the main path, plus each way the change can realistically fail. Not a case per branch.
 
-Then run the repo's format and typecheck commands (from AGENTS.md) yourself — a Bash call, not an
-agent — and hand any failures back to the tester.
+Then run the repo's format and typecheck commands (from AGENTS.md) yourself — or its own
+verification agents if it has them, see step 5 — and hand any failures back to the tester.
 
 ### 4. Implement
 
@@ -59,6 +59,13 @@ One package affected? One agent. Do not parallelize for its own sake.
 
 Run the repo's format, codegen, typecheck, and test commands (from AGENTS.md). These are Bash
 calls from this thread — there is no agent for running a command and reading its exit code.
+
+**Use the repo's own verification agents when it has them.** Look in `.claude/agents/` at the repo
+root and in the package directory you are verifying. A repo that ships an agent for its linter,
+type checker or test runner knows something the raw command does not — how to read its output, and
+how to fix what it finds. Invoke those agents in parallel, one message, instead of the bare
+commands. Run the bare commands only for what no agent covers.
+
 
 On failure, hand the errors to the `developer` agent that owns those files, then re-run. Repeat
 until green. No round limit.
