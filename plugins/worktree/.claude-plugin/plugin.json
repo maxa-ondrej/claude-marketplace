@@ -1,6 +1,6 @@
 {
   "name": "worktree",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "herdr worktree launcher: open a branch in an isolated worktree, run a Claude agent in it on /dev-loop:work (or a prompt you pass), remove the worktree when that agent exits.",
   "author": {
     "name": "Ondrej Maxa"

@@ -43,13 +43,14 @@ override when the caller explicitly supplied one.
 
 ## Optional host-repo config
 
-Read a `## Worktree` section from the host repo's CLAUDE.md (or AGENTS.md) if present. Both keys
-are optional; with no section, skip straight to the launch.
+Read a `## Worktree` section from the host repo's CLAUDE.md (or AGENTS.md) if present. Every key
+is optional; with no section, skip straight to the launch.
 
 | Key | Meaning |
 |---|---|
 | `seed` | Gitignored files a fresh checkout lacks, copied in from the main checkout — an inline list of paths, or the name of a file at repo root holding one path per line (e.g. `.worktreeinclude`) |
 | `setup` | A shell command run inside the worktree before the agent starts (e.g. `direnv allow && pnpm install`) |
+| `teardown` | A shell command run inside the worktree after the agent exits, before the checkout is removed (e.g. `docker compose down -v`) |
 
 ## Execution
 
@@ -107,6 +108,7 @@ cd "$WT"
 <setup command, if configured>
 rm -f "$WT/.herdr-launch.sh"
 claude --dangerously-skip-permissions --append-system-prompt "\$(cat ${CLAUDE_PLUGIN_ROOT}/skills/worktree/agent-system-prompt.md)" "<prompt>"
+(cd "$WT" && <teardown command, if configured>) || true
 cd "$REPO" && herdr worktree remove --workspace $WS --force
 EOF
 herdr pane run "$PANE" "bash $WT/.herdr-launch.sh"
@@ -124,8 +126,11 @@ Notes:
   main checkout.
 - The `--append-system-prompt` makes the launched agent speak briefly and ask questions
   interactively. Always pass it.
-- The teardown line runs when the launched `claude` process exits, for any reason. It removes the
+- The last two lines run when the launched `claude` process exits, for any reason. It removes the
   checkout and closes the workspace. **The branch survives** — only the working copy goes.
+- The `teardown` command runs first, while the checkout still exists — anything it needs (a
+  compose file, an `.envrc`) is gone after removal. Its failure never blocks the removal. Omit the
+  line entirely if no `teardown` is configured.
 - `--force` discards anything uncommitted in the worktree. The launched agent is responsible for
   committing and pushing before it exits.
 - Do not `--focus`; keep the user where they are.
@@ -149,4 +154,5 @@ herdr worktree list --cwd "$(git rev-parse --show-toplevel)"
 herdr worktree remove --workspace <WS> --force
 ```
 
-Check `git -C <path> status --porcelain` first and warn if it is dirty.
+Check `git -C <path> status --porcelain` first and warn if it is dirty. Run the `teardown`
+command inside the worktree before removing it, if one is configured.
