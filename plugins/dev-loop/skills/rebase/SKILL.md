@@ -14,8 +14,8 @@ Move the branch onto current `main` or `master`, deal with the conflicts, and pu
 back as it was.
 
 > **A wrong conflict resolution loses code silently.** It compiles, the tests may even pass, and the
-> lost line only turns up weeks later. Step 4 says which conflicts you may resolve and which ones
-> you must hand back.
+> lost line only turns up weeks later. So this skill never guesses: step 4 resolves only the
+> conflicts where both sides survive, and asks the user about every one that is a judgment call.
 
 ## Execution
 
@@ -82,9 +82,27 @@ git diff                                           # the conflict markers
 - Keeping both sides would run the same work twice, or skip a guard.
 - You cannot tell what one side was trying to do.
 
-To hand back, leave the rebase in progress, print the file, both sides, and what you think each was
-for. Then let the user decide. `git rebase --abort` puts the branch back as it was, and the backup
-branch is there either way.
+To hand back, leave the rebase in progress and ask — **one conflict at a time**, never a batch.
+For each one, print:
+
+- the file and the line range
+- **the branch's side**, and what it was trying to do
+- **the base's side**, and what it was trying to do
+
+Then ask with `AskUserQuestion`:
+
+- **Keep the branch's version** — the base's change to this hunk is dropped
+- **Keep the base's version** — this branch's change to this hunk is dropped
+- **Combine them** — show the exact text you would write, so the user reads it before it lands
+- **Other** — their own resolution, or abort
+
+Say out loud which side loses what, in the option text. "Keep the branch's version" is a decision to
+drop somebody's change on the base, and the user should see that when they choose.
+
+Never resolve the next conflict before this one is answered. A batch of questions about hunks the
+user cannot see in context is how a wrong answer gets clicked.
+
+`git rebase --abort` puts the branch back as it was, and the backup branch is there either way.
 
 **Never resolve with `--ours` or `--theirs` across a whole file** unless the file is generated. It
 throws away one side without reading it, which is the exact failure this skill exists to avoid.
