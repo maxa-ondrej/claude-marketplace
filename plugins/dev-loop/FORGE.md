@@ -107,6 +107,44 @@ glab mr update <iid> --description "$(cat <file>)"
 
 Write the body to a file first. Both CLIs mangle a long body passed inline.
 
+### Reviewer signals
+
+Code owners for the changed files:
+
+```bash
+# GitHub: owners are requested on the PR, plus the CODEOWNERS file itself
+gh api "repos/{owner}/{repo}/pulls/<number>/requested_reviewers" --jq '.users[].login'
+# GitLab: the MR's own code-owner approval rules
+glab api "projects/:fullpath/merge_requests/<iid>/approval_state" \
+  | jq -r '.rules[] | select(.rule_type=="code_owner") | .eligible_approvers[].username'
+```
+
+Both can come back empty. Fall back to the `CODEOWNERS` file — `CODEOWNERS`, `.github/CODEOWNERS`,
+`.gitlab/CODEOWNERS` or `docs/CODEOWNERS` — matched against the changed paths.
+
+Who reviews your work most:
+
+```bash
+gh search prs --author=@me --state=closed --json number --jq '.[].number'   # then read each PR's reviews
+gh pr list --author=@me --state=merged --limit 30 --json reviews --jq '.[].reviews[].author.login'
+glab api "projects/:fullpath/merge_requests?author_username=<me>&state=merged&per_page=30" \
+  | jq -r '.[].reviewers[]?.username'
+```
+
+How much review work a person already has:
+
+```bash
+gh search prs --review-requested=<user> --state=open --json number --jq 'length'
+glab mr list --reviewer=<user> --output json --jq 'length'
+```
+
+Assign reviewers:
+
+```bash
+gh pr edit <number> --add-reviewer "user1,user2"
+glab mr update <iid> --reviewer "user1,user2"
+```
+
 ### CI
 
 ```bash
