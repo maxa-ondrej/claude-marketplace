@@ -42,8 +42,8 @@ git reset --soft @{upstream}
 ```
 
 Name it for the round, not for the mechanics: `Address review: guard the empty batch`, never
-`fixes`. Then run **step 5** of the full mode to prove the code did not change, and push with a
-lease.
+`fixes`. Then run **step 5** of the full mode to prove the code did not change, and **step 6** to
+push — which asks first, the same as the full mode.
 
 **Round mode does not touch any commit the reviewer has read, so review threads keep their
 anchors.** That is the whole reason it exists, and the reason it is the automatic mode. Use the
@@ -71,10 +71,12 @@ Stop, and say why, when:
 
 ```bash
 git rev-parse HEAD                              # write this SHA into your report
-git branch "tidy-backup-$(git rev-parse --short HEAD)" HEAD
+git branch "backup/$(git branch --show-current)" HEAD
 ```
 
 The branch is the safety net. Keep it until the user says the result is good.
+
+A `backup/<branch>` already there from an earlier run? Ask before you overwrite it.
 
 ### 3. Plan the grouping
 
@@ -86,20 +88,34 @@ git diff "$BASE" --stat
 git diff "$BASE"
 ```
 
-Group the changes so each commit does **one thing** and builds on the one before it. A good
-grouping follows the shape of the work: the shared type or schema first, then the code that uses
-it, then the tests, then anything that only touches style.
+Understand what each change does, and why, before you group anything.
+
+Each commit has **one logical purpose**: a refactor, a new model or migration, one piece of
+business logic, one API endpoint, a config change. Never `WIP`, never `fix typo`.
+
+Order them so each builds on the last:
+
+1. **Preparation** — refactors and infrastructure that later commits need
+2. **Features** — the work itself
+3. **Cleanup** — anything left over
 
 Rules:
 
-- A commit that only repairs an earlier commit in this branch (`fix test`, `typo`,
-  `address review`) is not a commit. Its changes belong in the commit it repairs.
-- Never split a commit so that a middle commit does not build. Each commit must compile on its own.
+- **Keep tests in the same commit as the code they cover.** A commit that adds behaviour and a
+  commit that tests it are one commit, not two.
+- **Every commit must build and pass tests on its own.** No broken state in the middle of the
+  branch. Step 5 proves this, commit by commit.
+- Squash the noise into the commit it belongs to: fixups, a revert and the thing it reverted, and
+  formatting-only churn.
 - Fewer, larger commits beat many tiny ones. Three good commits beat eight.
 - `$ARGUMENTS` says how to group. Follow it.
 
-Show the user the plan — the old list, the new list, and which old commit goes where — before you
-touch anything.
+**Show the plan and wait.** Print, for each planned commit, its subject line and the files or hunks
+that go into it, plus which old commits it absorbs. Then ask with `AskUserQuestion`:
+**Rewrite** / **Change the plan** / **Cancel**.
+
+Nothing is rewritten until the user says so. On **Change the plan**, take their grouping, print the
+new plan, and ask again.
 
 ### 4. Rewrite
 
@@ -114,14 +130,16 @@ git restore --staged .
 Then, for each planned commit: stage exactly its paths (`git add <paths>`, or `git add -p` through
 a patch file for a split inside one file) and commit with a HEREDOC message.
 
-Messages follow the repo's own convention from `git log` on the base branch. **Plain English, as
-short as possible.** The subject says what the commit does. The body says **why**, only when why is
-not obvious. No `Co-Authored-By`, `Generated-By`, or AI attribution footers.
+Messages follow the repo's own convention from `git log` on the base branch. Within that:
+
+- **Subject: imperative, 72 characters or fewer.** "Add the retry window", not "Added" or "Adding".
+- **Body: short, and about why.** Leave it out when the subject says everything.
+- Simple technical English. No `Co-Authored-By`, `Generated-By`, or AI attribution footers.
 
 ### 5. Prove the code did not change
 
 ```bash
-git diff "tidy-backup-<sha>" HEAD        # MUST print nothing
+git diff "backup/<branch>" HEAD          # MUST print nothing
 ```
 
 Output of any kind means the rewrite lost or changed work.
@@ -129,14 +147,26 @@ Output of any kind means the rewrite lost or changed work.
 **Undo at once, do not try to repair it:**
 
 ```bash
-git reset --hard "tidy-backup-<sha>"
+git reset --hard "backup/<branch>"
 ```
 
 Then tell the user what the difference was. A failed tidy that was undone is a good outcome. A
 tidy that quietly changed the code is the worst thing this skill can do.
 
-Also run the repo's typecheck and tests on the final commit. The tree is identical, so they must
-pass exactly as they did before.
+Then prove there is no broken state in the middle. Walk the new commits and run the repo's
+typecheck and tests on **each** one:
+
+```bash
+for sha in $(git rev-list --reverse "$BASE"..HEAD); do
+  git checkout -q "$sha" && <typecheck> && <test>   || echo "BROKEN: $sha"
+done
+git checkout -q -       # back to the branch
+```
+
+A commit that fails belongs with its neighbour. Change the plan, go back to step 4, and say which
+commit could not stand alone.
+
+Skip this walk only when the user asks you to, and say that you skipped it.
 
 ### 6. Push
 
@@ -154,6 +184,10 @@ Warn the user, before you push, when the PR has review threads: those threads po
 commits, and the rewrite leaves their anchors behind. Say how many threads will be affected, from
 `FORGE.md` (**Threads**).
 
+**Ask before you push.** Show what the remote has now and what it will have, then ask with
+`AskUserQuestion`: **Force-push** / **Keep it local**. Never push a rewrite the user did not agree
+to — somebody may already be reading those commits.
+
 ```bash
 git push --force-with-lease
 ```
@@ -167,5 +201,5 @@ The old commit list, the new one, the backup branch name, and the check from ste
 to delete the backup branch when they are happy:
 
 ```bash
-git branch -D "tidy-backup-<sha>"
+git branch -D "backup/<branch>"
 ```
