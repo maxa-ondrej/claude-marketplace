@@ -118,13 +118,23 @@ A rebase rewrites every commit on the branch.
 
 ```bash
 git push --force-with-lease
-git stash pop
 ```
 
 The lease refuses the push if the remote moved since the fetch in step 1. Never a plain `--force`.
 
-**Pop after the push, never before.** If the pop conflicts, the pushed branch is still the clean
-rebase, and the mess stays local.
+Then bring the description up to date with `/dev-loop:describe`. A rebase changes what the branch
+contains against its base — commits from the base are no longer part of the change, and a conflict
+you resolved may have altered what the branch does. A description written before the rebase can now
+claim something the branch no longer does.
+
+Finally, put the working tree back:
+
+```bash
+git stash pop
+```
+
+**Pop last, after the push and the description.** If the pop conflicts, the pushed branch is still
+the clean rebase, the description is still right, and the mess stays local.
 
 Pop conflicts? Resolve it with the same rules as step 4, or leave it in the stash and say so:
 `git stash list` keeps it, and nothing is lost.
@@ -132,7 +142,7 @@ Pop conflicts? Resolve it with the same rules as step 4, or leave it in the stas
 ### 7. Report
 
 The base it rebased onto, how many commits moved, which conflicts you resolved and how, anything
-you handed back, the test result, and the backup branch name:
+you handed back, the test result, whether the description changed, and the backup branch name:
 
 ```bash
 git branch -D "backup/<branch>"        # when the user is happy
