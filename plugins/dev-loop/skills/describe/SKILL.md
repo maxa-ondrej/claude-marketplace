@@ -81,6 +81,8 @@ Rules:
   must be set, an order the deploy must follow.
 - If the project's tracker workflow wants a ticket link in the body, include it. Getting the link
   belongs to that tracker plugin, not here.
+- End the body with the footer from **Sign everything you post** in `FORGE.md`, and keep it in the
+  draft you show the user.
 - `$ARGUMENTS` says what to emphasise. It never overrides the diff.
 
 ### 4. Show it and ask

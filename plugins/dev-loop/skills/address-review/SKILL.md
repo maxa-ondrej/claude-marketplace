@@ -47,7 +47,7 @@ Review comments live on threads. Fetch them with their ids — **Threads** in `F
 
 Skip threads already resolved, and GitLab system notes — those are not comments.
 Pair each remaining one with its triage outcome and commit SHA. Top-level PR comments are not
-threads — answer those with the plain comment command at the end.
+threads — answer those with the plain comment command at the end, footer included.
 
 Then, **one thread at a time, in order**:
 
@@ -61,7 +61,8 @@ Then, **one thread at a time, in order**:
 
 3. Ask with `AskUserQuestion` whether to send it: **Send** / **Edit** / **Skip**. On Edit, take
    their wording, show it back, and ask again. Post only what they approved, with **Reply into a
-   thread** from `FORGE.md`.
+   thread** from `FORGE.md`. Every reply ends with the footer from **Sign everything you post** —
+   show it in the draft.
 4. **Then always ask, separately: resolve this thread too?** Every thread, whether you replied or
    skipped — never bundle it into the reply question, and never resolve because replying seemed to
    settle it. Yes → **Resolve a thread** in `FORGE.md`. No → leave it open.

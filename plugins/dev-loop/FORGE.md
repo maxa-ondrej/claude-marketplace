@@ -16,6 +16,31 @@ else's view of the PR.
 Terminology differs and the skills use the GitHub words: a GitLab **MR** is a PR, a **discussion**
 is a thread, and an MR is identified by its `iid`, not a number.
 
+## Sign everything you post
+
+Every piece of text this plugin posts to a forge — a thread reply, a note, a PR or MR description —
+ends with this footer, after a blank line:
+
+```markdown
+
+---
+_Sent by Claude Code_
+```
+
+A colleague who reads a comment must be able to see that a person did not type it. They answer it
+differently when they know.
+
+Two rules about it:
+
+- **Not on commits.** Commit messages carry no attribution footer. That rule is in
+  `/dev-loop:ship` and this does not change it.
+- **Do not write `@Claude`.** Both forges turn `@name` into a mention. `@claude` is a real account
+  on GitHub, so the mention notifies a stranger, and on a self-hosted GitLab it either pings
+  whoever holds that name or renders as a dead link. Plain text, no `@`.
+
+Count the footer as part of the text the user approves. Show it in the draft, so nobody is
+surprised by what went up.
+
 ## Operations
 
 `gh` substitutes `{owner}` and `{repo}` in REST paths; `glab` substitutes `:fullpath`. Neither
