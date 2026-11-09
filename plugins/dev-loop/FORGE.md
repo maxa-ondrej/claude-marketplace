@@ -24,19 +24,20 @@ ends with this footer, after a blank line:
 ```markdown
 
 ---
-_Sent by Claude Code_
+_Sent using @Claude_
 ```
 
-A colleague who reads a comment must be able to see that a person did not type it. They answer it
-differently when they know.
+Use this text exactly. A colleague who reads a comment must be able to see that a person did not
+type it. They answer it differently when they know.
 
 Two rules about it:
 
 - **Not on commits.** Commit messages carry no attribution footer. That rule is in
   `/dev-loop:ship` and this does not change it.
-- **Do not write `@Claude`.** Both forges turn `@name` into a mention. `@claude` is a real account
-  on GitHub, so the mention notifies a stranger, and on a self-hosted GitLab it either pings
-  whoever holds that name or renders as a dead link. Plain text, no `@`.
+- **`@Claude` is a mention.** Both forges turn `@name` into a link to that account. On a GitLab
+  where a Claude account exists, the footer links to it, which is the point. On a forge where it
+  does not exist, the mention can notify an unrelated account that holds the name. Check the first
+  comment you post to a forge you have not posted to before, and tell the user what it linked to.
 
 Count the footer as part of the text the user approves. Show it in the draft, so nobody is
 surprised by what went up.
