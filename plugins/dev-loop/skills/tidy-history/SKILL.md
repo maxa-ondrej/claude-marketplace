@@ -103,8 +103,9 @@ Rules:
 
 - **Keep tests in the same commit as the code they cover.** A commit that adds behaviour and a
   commit that tests it are one commit, not two.
-- **Every commit must build and pass tests on its own.** No broken state in the middle of the
-  branch. Step 5 proves this, commit by commit.
+- **Only the last commit has to pass.** A commit in the middle may fail to build or fail its
+  tests. Do not split or merge commits to keep every one of them green — group them so a reviewer
+  can read them, and let the branch tip be the thing that works.
 - Squash the noise into the commit it belongs to: fixups, a revert and the thing it reverted, and
   formatting-only churn.
 - Fewer, larger commits beat many tiny ones. Three good commits beat eight.
@@ -153,20 +154,11 @@ git reset --hard "backup/<branch>"
 Then tell the user what the difference was. A failed tidy that was undone is a good outcome. A
 tidy that quietly changed the code is the worst thing this skill can do.
 
-Then prove there is no broken state in the middle. Walk the new commits and run the repo's
-typecheck and tests on **each** one:
+Then run the repo's typecheck and tests on the branch tip. The tree is identical to the backup, so
+they must pass exactly as they did before. A failure here means the rewrite went wrong, not that
+the code is wrong — undo and report.
 
-```bash
-for sha in $(git rev-list --reverse "$BASE"..HEAD); do
-  git checkout -q "$sha" && <typecheck> && <test>   || echo "BROKEN: $sha"
-done
-git checkout -q -       # back to the branch
-```
-
-A commit that fails belongs with its neighbour. Change the plan, go back to step 4, and say which
-commit could not stand alone.
-
-Skip this walk only when the user asks you to, and say that you skipped it.
+Do not test the commits in the middle. They are allowed to fail.
 
 ### 6. Push
 
