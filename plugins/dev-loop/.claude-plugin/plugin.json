@@ -1,6 +1,6 @@
 {
   "name": "dev-loop",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "description": "Development loop as composable skills \u2014 research, plan, implement, review, ship \u2014 with /work running the whole chain. Each writes markdown into .dev-loop/ that the next one reads. Stack rules come from each repo's AGENTS.md.",
   "author": {
     "name": "Ondrej Maxa"
