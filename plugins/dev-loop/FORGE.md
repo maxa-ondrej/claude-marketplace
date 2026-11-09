@@ -21,23 +21,25 @@ is a thread, and an MR is identified by its `iid`, not a number.
 Every piece of text this plugin posts to a forge — a thread reply, a note, a PR or MR description —
 ends with this footer, after a blank line:
 
-```markdown
+````markdown
 
 ---
-_Sent using @Claude_
-```
+_Sent using `@Claude`_
+````
 
-Use this text exactly. A colleague who reads a comment must be able to see that a person did not
-type it. They answer it differently when they know.
+Use this text exactly, **with the backticks**. A colleague who reads a comment must be able to see
+that a person did not type it. They answer it differently when they know.
 
-Two rules about it:
+Three rules about it:
 
+- **The backticks are not decoration.** They stop the forge from turning `@Claude` into a mention.
+  On gitlab.com, `@Claude` is a real person — Francisco Claude-Faust — and a bare mention would
+  notify a stranger on every single reply. Inside backticks it renders as code and links to
+  nobody.
+- **Never write a bare `@` in anything you post.** Not in a reply, not in a note, not in a
+  description. A name that looks like a bot on one forge is somebody's account on another.
 - **Not on commits.** Commit messages carry no attribution footer. That rule is in
   `/dev-loop:ship` and this does not change it.
-- **`@Claude` is a mention.** Both forges turn `@name` into a link to that account. On a GitLab
-  where a Claude account exists, the footer links to it, which is the point. On a forge where it
-  does not exist, the mention can notify an unrelated account that holds the name. Check the first
-  comment you post to a forge you have not posted to before, and tell the user what it linked to.
 
 Count the footer as part of the text the user approves. Show it in the draft, so nobody is
 surprised by what went up.
