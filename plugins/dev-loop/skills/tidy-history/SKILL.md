@@ -43,7 +43,7 @@ git reset --soft @{upstream}
 
 Name it for the round, not for the mechanics: `Address review: guard the empty batch`, never
 `fixes`. Then run **step 5** of the full mode to prove the code did not change, and **step 6** to
-push — which asks first, the same as the full mode.
+push.
 
 **Round mode does not touch any commit the reviewer has read, so review threads keep their
 anchors.** That is the whole reason it exists, and the reason it is the automatic mode. Use the
@@ -176,9 +176,8 @@ Warn the user, before you push, when the PR has review threads: those threads po
 commits, and the rewrite leaves their anchors behind. Say how many threads will be affected, from
 `FORGE.md` (**Threads**).
 
-**Ask before you push.** Show what the remote has now and what it will have, then ask with
-`AskUserQuestion`: **Force-push** / **Keep it local**. Never push a rewrite the user did not agree
-to — somebody may already be reading those commits.
+Push without asking. The user approved the rewrite at the plan gate in step 3, and the lease is
+the protection that matters here.
 
 ```bash
 git push --force-with-lease
