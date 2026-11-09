@@ -1,7 +1,7 @@
 ---
 name: tidy-history
-description: Reshape the branch's commits into logical commits that each do one thing, reword them to say why, and force-push with a lease. Use when the user asks to clean up, squash, reshape, or rewrite the commit history of a branch.
-argument-hint: [nothing — tidies the current branch] | [how to group the commits]
+description: Reshape the branch's commits into logical commits that each do one thing, reword them to say why, and force-push with a lease. Pass --round to fold only this review round's fix commits into one, which keeps reviewed commits untouched. Use when the user asks to clean up, squash, reshape, or rewrite the commit history of a branch.
+argument-hint: [nothing — reshapes the whole branch] | --round | [how to group the commits]
 ---
 
 > **Talk to the user in ASD-STE100 Simplified Technical English.** Approved words only. One idea
@@ -16,7 +16,40 @@ one at a time.
 > **The code must not change.** This skill moves the same work into different commits. Step 5
 > proves the tree is identical and undoes everything if it is not. Never skip it.
 
-## Execution
+Two modes:
+
+- **Full reshape** (default) — regroup every commit on the branch.
+- **Round mode** (`--round`) — fold only the commits added since the last push into one commit.
+  `/dev-loop:ship` runs this after each review round.
+
+## Round mode (`--round`)
+
+A review round leaves commits like `address review` and `fix test` on top of commits a reviewer has
+already read. Round mode squashes **only the new ones**, into one commit that says what the round
+changed.
+
+```bash
+git fetch origin
+git log --oneline @{upstream}..HEAD          # the round's commits
+```
+
+Nothing new, or one commit already? Say so and stop — there is nothing to fold.
+
+Then soft-reset to the upstream commit and make one commit from the result:
+
+```bash
+git reset --soft @{upstream}
+```
+
+Name it for the round, not for the mechanics: `Address review: guard the empty batch`, never
+`fixes`. Then run **step 5** of the full mode to prove the code did not change, and push with a
+lease.
+
+**Round mode does not touch any commit the reviewer has read, so review threads keep their
+anchors.** That is the whole reason it exists, and the reason it is the automatic mode. Use the
+full reshape by hand, when you accept that the threads lose their anchors.
+
+## Execution (full reshape)
 
 ### 1. Refuse unless it is safe to start
 

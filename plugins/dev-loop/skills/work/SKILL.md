@@ -52,6 +52,9 @@ Then, while any `Blocker` or `Must Fix` finding is unchecked:
 1. `/dev-loop:implement --fix`
 2. `/dev-loop:review` again
 
+After each round's fixes are committed, run `/dev-loop:tidy-history --round` to fold that round
+into one commit.
+
 Loop until clean. **No round limit** — but if the same finding survives three rounds, stop looping
 and bring it to the user. Three failed attempts means the finding is wrong, the fix is wrong, or
 the plan was wrong, and another round will not discover which.

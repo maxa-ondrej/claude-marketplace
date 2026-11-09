@@ -86,6 +86,11 @@ You will be notified when each finishes.
 - **CI failed** → read the logs, fix, restart from step 3
 - **Comments arrived** → `/dev-loop:address-review`, which triages, fixes, ships, and answers the
   threads. Only reaching for the pieces? `/dev-loop:review --pr` then `/dev-loop:implement --fix`
+
+When a review round's fixes are committed, run `/dev-loop:tidy-history --round`. It folds that
+round's commits into one named commit, so the branch does not reach merge as a list of `fix test`
+and `address review`. Round mode leaves every reviewed commit alone, so the open threads keep their
+anchors.
 - **Green, no comments** → done
 
 New commits went up since the description was written — a fix round, a CI repair? Run
