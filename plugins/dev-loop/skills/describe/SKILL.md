@@ -6,12 +6,18 @@ argument-hint: [nothing — describes the current branch's PR] | [what to emphas
 
 > **Talk to the user in ASD-STE100 Simplified Technical English.** Approved words only. One idea
 > per short sentence. Active voice. The same word for the same thing every time. No jargon, no
-> idioms, no long noun groups. This governs what you say, never what the code or the commit says.
+> idioms, no long noun groups. **The description you write obeys this too** — it is text a person
+> reads. Only the code itself is outside the rule.
 
 # Describe Skill
 
-Write the description a reviewer reads first. `/dev-loop:ship` calls this skill, so there is one
-body format in one place. It also runs on its own, to refresh a description after more commits.
+Write the description a reviewer reads first, and bring it up to date when the branch moves on.
+`/dev-loop:ship` calls this skill, so there is one body format in one place. It also runs on its
+own.
+
+**Assume the description is out of date.** Read the current one, compare it against the branch as
+it is now, and say in your report what changed — a description that describes an older version of
+the branch is worse than no description.
 
 > **Never post a description the user has not seen.** Colleagues read it, and a wrong description
 > sends a reviewer down the wrong path. Show it, then ask.
@@ -29,6 +35,8 @@ Never assume `origin/main` — this repo may use `master`. Then find the PR for 
 the body and return it, do not try to post.
 
 ### 2. Read what changed
+
+Read the description that is there now, per `FORGE.md`, so you can see what has gone stale.
 
 ```bash
 git log --reverse --format='%s%n%b' "$BASE"..HEAD
@@ -62,8 +70,11 @@ worth a line in the description.
 
 Rules:
 
-- **Plain English, as short as possible.** Bullets when there is more than one point. Plain words
-  over jargon. Never restate the diff line by line, and never pad a section to look thorough.
+- **Simple technical English, as short as possible.** Approved words. One idea per sentence.
+  Active voice. The same word for the same thing. No jargon the code does not already use.
+- **Bullets, not prose.** A bullet is the default for every point in every section. Use a sentence
+  of prose only when a bullet cannot carry the idea, which is rare. Never a paragraph.
+- Never restate the diff line by line, and never pad a section to look thorough.
 - An honestly empty section beats invented content. No tests? Say what you did instead.
 - Leave out `## Changes` for a change of one or two files — the diff already shows it.
 - Add anything the reviewer must know to review safely: a migration, a breaking change, a flag that
@@ -87,4 +98,4 @@ user approved.
 
 ### 6. Report
 
-One line: posted or returned, and the PR link.
+One line: posted or returned, and the PR link. Name what went stale, if anything did.
