@@ -98,6 +98,15 @@ gh pr create --title '<title>' --body '<body>'
 glab mr create --title '<title>' --description '<body>'
 ```
 
+### Set the PR description
+
+```bash
+gh pr edit <number> --body-file <file>
+glab mr update <iid> --description "$(cat <file>)"
+```
+
+Write the body to a file first. Both CLIs mangle a long body passed inline.
+
 ### CI
 
 ```bash

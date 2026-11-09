@@ -66,18 +66,9 @@ Then open the PR per `FORGE.md` (**Open a PR**), unless one already exists — `
 `glab` on GitLab. If the project's tracker workflow defines a PR-body convention (a Notion/Jira link, say), follow it — the lookup itself belongs to that tracker
 plugin, not here.
 
-The body, whichever forge it goes to — pass it with a HEREDOC so the formatting survives:
-
-```markdown
-## Summary
-- <bullets>
-
-## Test plan
-- <how it was verified>
-```
-
-**Plain English, as short as possible, bullets over prose** — same rule as the commit message.
-A short section beats a padded one, and an honestly empty one beats invented content.
+For the body, run `/dev-loop:describe`. It writes the description from the commits, the diff and
+the plan, shows it to the user, and hands it back here to open the PR with. Do not write a body
+inline — one skill owns that format.
 
 Return the PR URL.
 
@@ -96,6 +87,10 @@ You will be notified when each finishes.
 - **Comments arrived** → `/dev-loop:address-review`, which triages, fixes, ships, and answers the
   threads. Only reaching for the pieces? `/dev-loop:review --pr` then `/dev-loop:implement --fix`
 - **Green, no comments** → done
+
+New commits went up since the description was written — a fix round, a CI repair? Run
+`/dev-loop:describe` again. A description that describes an older version of the branch misleads
+every reviewer who reads it.
 
 ### 9. Report
 
