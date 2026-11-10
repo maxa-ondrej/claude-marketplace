@@ -18,8 +18,10 @@ is a thread, and an MR is identified by its `iid`, not a number.
 
 ## Sign everything you post
 
-Every piece of text this plugin posts to a forge — a thread reply, a note, a PR or MR description —
-ends with this footer, after a blank line:
+Everything this plugin posts to a forge is signed. A colleague who reads it must be able to see
+that a person did not type it. They answer it differently when they know.
+
+**A comment — a thread reply or a plain note** — ends with this, after a blank line:
 
 ````markdown
 
@@ -27,10 +29,18 @@ ends with this footer, after a blank line:
 _Sent using `@Claude`_
 ````
 
-Use this text exactly, **with the backticks**. A colleague who reads a comment must be able to see
-that a person did not type it. They answer it differently when they know.
+**A PR or MR description** ends with this instead:
 
-Three rules about it:
+```markdown
+
+---
+Co-Authored-By: Claude Code
+```
+
+A description is the work's own record, so it names the author the way a commit trailer does. A
+comment is one side of a conversation, so it says who is speaking.
+
+Three rules about both:
 
 - **The backticks are not decoration.** They stop the forge from turning `@Claude` into a mention.
   On gitlab.com, `@Claude` is a real person — Francisco Claude-Faust — and a bare mention would
@@ -38,8 +48,9 @@ Three rules about it:
   nobody.
 - **Never write a bare `@` in anything you post.** Not in a reply, not in a note, not in a
   description. A name that looks like a bot on one forge is somebody's account on another.
-- **Not on commits.** Commit messages carry no attribution footer. That rule is in
-  `/dev-loop:ship` and this does not change it.
+- **Not on commits.** A commit message carries no footer at all, not even `Co-Authored-By`. That
+  rule is in `/dev-loop:ship` and this does not change it. Only the PR or MR description gets the
+  trailer.
 
 Count the footer as part of the text the user approves. Show it in the draft, so nobody is
 surprised by what went up.
