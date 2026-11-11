@@ -74,20 +74,26 @@ Then, for **every thread a colleague wrote**, one at a time, in order:
    did, not how you thought about it. No jargon the reviewer did not use, no hedging, no thanking
    them for the "great catch". If the draft runs past three sentences, cut it.
 
-3. Ask with `AskUserQuestion` whether to send it: **Send** / **Edit** / **Skip**. On Edit, take
-   their wording, show it back, and ask again. Post only what they approved, with **Reply into a
-   thread** from `FORGE.md`. Every reply ends with the footer from **Sign everything you post** —
-   show it in the draft.
-4. **Then always ask, separately: resolve this thread too?** Every thread, whether you replied or
-   skipped — never bundle it into the reply question, and never resolve because replying seemed to
-   settle it. Yes → **Resolve a thread** in `FORGE.md`. No → leave it open.
+3. Ask with `AskUserQuestion` — **one question, these four options, every time**:
 
-   Skip only this question for a thread that cannot be resolved (a GitLab system note), and say why.
+   - **Reply and resolve** — post the draft, then resolve the thread
+   - **Reply only** — post the draft, leave the thread open
+   - **Edit message** — they give new wording; show the new draft and ask again
+   - **Do nothing** — leave the thread alone
+
+   Reply first, then resolve, when they pick both. Post with **Reply into a thread** from
+   `FORGE.md`, and resolve with **Resolve a thread**.
+
+   Every reply ends with the footer from **Sign everything you post** — show it in the draft, so
+   what they approve is what goes up.
+
+   The one time the options change: a thread that cannot be resolved, such as a GitLab system note.
+   Drop **Reply and resolve** there and say why.
 
 A thread left open is a valid answer, not a failure.
 
-Both rules still hold for the user's own threads: nothing is resolved without their word, and the
-reply still carries the footer. The only thing that changes is that nobody is asked.
+For the user's own threads, nothing is asked at all: the draft is posted and the thread is left
+open.
 
 ### 5. Report
 
