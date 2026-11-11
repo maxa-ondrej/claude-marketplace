@@ -17,6 +17,9 @@ the part none of them do: closing the loop with the people who commented.
 > **Never post a reply or resolve a thread the user did not explicitly choose, thread by thread, in
 > step 4.** Post only wording the user has seen. These are messages to colleagues under the user's
 > name — there is no undo that unsends them.
+>
+> **One exception: a thread the user wrote themselves.** Reply to it without asking — they are
+> reading their own note, not receiving a message. Still never resolve it.
 
 ## Execution
 
@@ -49,7 +52,19 @@ Skip threads already resolved, and GitLab system notes — those are not comment
 Pair each remaining one with its triage outcome and commit SHA. Top-level PR comments are not
 threads — answer those with the plain comment command at the end, footer included.
 
-Then, **one thread at a time, in order**:
+Find out who you are posting as — **Who you are posting as** in `FORGE.md` — and split the
+threads by author.
+
+**A thread the user wrote themselves is not a conversation with anybody.** It is their own note on
+their own code, so there is nobody to ask and nobody to answer:
+
+- **Post the draft reply.** Do not ask first. Do not offer Send, Edit or Skip.
+- **Never resolve it.** The user closes their own notes, in their own time.
+- Draft it to the same standard as any other reply, and show what you posted in the report.
+
+Every other thread follows the steps below.
+
+Then, for **every thread a colleague wrote**, one at a time, in order:
 
 1. Print the thread: author, `path:line`, the comment, and its outcome — `Fixed in <sha>` or
    `Dropped: <reason>`.
@@ -70,6 +85,9 @@ Then, **one thread at a time, in order**:
    Skip only this question for a thread that cannot be resolved (a GitLab system note), and say why.
 
 A thread left open is a valid answer, not a failure.
+
+Both rules still hold for the user's own threads: nothing is resolved without their word, and the
+reply still carries the footer. The only thing that changes is that nobody is asked.
 
 ### 5. Report
 

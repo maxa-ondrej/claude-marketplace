@@ -146,6 +146,15 @@ glab mr update <iid> --description "$(cat <file>)"
 
 Write the body to a file first. Both CLIs mangle a long body passed inline.
 
+### Who you are posting as
+
+```bash
+gh api user --jq .login
+glab api user --jq .username
+```
+
+Compare it against a thread's author to tell the user's own comments from a colleague's.
+
 ### Reviewer signals
 
 Code owners for the changed files:
